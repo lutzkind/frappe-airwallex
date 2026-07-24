@@ -1,9 +1,6 @@
-stage=download
-download_exit=0 http_code=200 zip_exists=yes
-stage=unzip
-artifact_file=_temp/frappe-airwallex-sanitized.tar.gz
-artifact_file=control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence/sanitized-archive.sha256
-artifact_file=control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence/sanitized-audit.json
-artifact_file=control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence/unit-tests.txt
-missing_expected_tar=/home/runner/work/_temp/source-artifact/frappe-airwallex-sanitized.tar.gz
-bootstrap_status=failed exit=91
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100 45238  100 45238    0     0   124k      0 --:--:-- --:--:-- --:--:--  124k
+/home/runner/work/_temp/source-artifact/_temp/frappe-airwallex-sanitized.tar.gz: OK
+
+import_outcome=failure
