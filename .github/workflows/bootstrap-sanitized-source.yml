@@ -18,53 +18,37 @@ jobs:
       - name: Import audited standalone source
         shell: bash
         env:
-          SOURCE_ARTIFACT_URL: "https://productionresultssa2.blob.core.windows.net/actions-results/47588121-994d-4874-825f-5a687188d8f6/workflow-job-run-cc264dbf-7d02-5bee-b517-dbc6e5921667/artifacts/dd0d7b683223136f209b9e80d6d76f8bf5a678e9debd2b99af2791875f83598a.zip?rscd=attachment%3B+filename%3D%22frappe-airwallex-sanitized.zip%22&rsct=application%2Fzip&se=2026-07-24T08%3A07%3A58Z&sig=VD3Xdq7ytRFakcvuEAjhhb3%2BkzTPHdZIMLVNLGA3MGA%3D&ske=2026-07-24T10%3A02%3A45Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&sks=b&skt=2026-07-24T06%3A02%3A45Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-11-05&sp=r&spr=https&sr=b&st=2026-07-24T07%3A57%3A53Z&sv=2025-11-05"
+          SOURCE_ARTIFACT_URL: "https://productionresultssa9.blob.core.windows.net/actions-results/3bfd420e-297a-4f39-909c-93df3a6d335b/workflow-job-run-79e30fb0-e580-53f1-ac32-8fa8d7312ef9/artifacts/dd0d7b683223136f209b9e80d6d76f8bf5a678e9debd2b99af2791875f83598a.zip?rscd=attachment%3B+filename%3D%22frappe-airwallex-sanitized.zip%22&rsct=application%2Fzip&se=2026-07-24T08%3A18%3A44Z&sig=5INFaB0uJNu%2BDfOMLEumWX6ucDaQTbNFXZUZvsZd3gw%3D&ske=2026-07-24T09%3A54%3A56Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&sks=b&skt=2026-07-24T05%3A54%3A56Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-11-05&sp=r&spr=https&sr=b&st=2026-07-24T08%3A08%3A39Z&sv=2025-11-05"
+          SOURCE_ARTIFACT_SHA256: "92c0b50b9fd65735ba540229f1e05590f237e91de75c412fc8944d3d9998538c"
         run: |
-          set -uo pipefail
-          exec > >(tee bootstrap-debug.txt) 2>&1
+          set -euo pipefail
           artifact_dir="$RUNNER_TEMP/source-artifact"
           source_dir="$RUNNER_TEMP/source"
           mkdir -p "$artifact_dir" "$source_dir"
-          status=0
 
-          echo "stage=download"
-          http_code="$(curl --silent --show-error --location --retry 2 --write-out '%{http_code}' "$SOURCE_ARTIFACT_URL" --output "$RUNNER_TEMP/source.zip")" || status=$?
-          echo "download_exit=$status http_code=$http_code zip_exists=$([ -s "$RUNNER_TEMP/source.zip" ] && echo yes || echo no)"
-
-          if [ "$status" -eq 0 ]; then
-            echo "stage=unzip"
-            unzip -q "$RUNNER_TEMP/source.zip" -d "$artifact_dir" || status=$?
-            find "$artifact_dir" -maxdepth 5 -type f -printf 'artifact_file=%P\n' | sort
-          fi
+          curl --fail --location --retry 3 "$SOURCE_ARTIFACT_URL" --output "$RUNNER_TEMP/source.zip"
+          echo "$SOURCE_ARTIFACT_SHA256  $RUNNER_TEMP/source.zip" | sha256sum --check --strict
+          unzip -q "$RUNNER_TEMP/source.zip" -d "$artifact_dir"
 
           tar_path="$artifact_dir/_temp/frappe-airwallex-sanitized.tar.gz"
           audit_path="$artifact_dir/control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence/sanitized-audit.json"
-          if [ "$status" -eq 0 ] && [ -f "$tar_path" ] && [ -f "$audit_path" ]; then
-            echo "stage=untar"
-            tar -xzf "$tar_path" -C "$source_dir" || status=$?
-            find "$source_dir" -maxdepth 3 -type f -printf 'source_file=%P\n' | sort
-          elif [ "$status" -eq 0 ]; then
-            echo "missing_expected_tar=$tar_path"
-            status=91
-          fi
+          test -f "$tar_path"
+          test -f "$audit_path"
+          tar -xzf "$tar_path" -C "$source_dir"
 
-          if [ "$status" -eq 0 ]; then
-            echo "stage=validate"
-            test "$(cat "$source_dir/airwallex_erpnext/__init__.py")" = '__version__ = "1.0.4"' || status=$?
-            grep -q '^version = "1.0.4"$' "$source_dir/pyproject.toml" || status=$?
-          fi
+          test "$(cat "$source_dir/airwallex_erpnext/__init__.py")" = '__version__ = "1.0.4"'
+          grep -q '^version = "1.0.4"$' "$source_dir/pyproject.toml"
+          python3 - "$audit_path" <<'PY'
+          import json
+          import sys
+          with open(sys.argv[1], encoding="utf-8") as handle:
+              report = json.load(handle)
+          if report.get("finding_count") != 0:
+              raise SystemExit(f"sanitization findings remain: {report}")
+          if report.get("files_scanned", 0) < 100:
+              raise SystemExit(f"unexpected scan coverage: {report}")
+          PY
 
-          if [ "$status" -ne 0 ]; then
-            echo "bootstrap_status=failed exit=$status"
-            git config user.name github-actions[bot]
-            git config user.email 41898282+github-actions[bot]@users.noreply.github.com
-            git add bootstrap-debug.txt
-            git commit -m 'chore: record source bootstrap diagnostics'
-            git push origin HEAD:main
-            exit "$status"
-          fi
-
-          echo "bootstrap_status=validated"
           shopt -s dotglob nullglob
           for item in "$source_dir"/*; do
             name="$(basename "$item")"
@@ -75,7 +59,7 @@ jobs:
             cp -a "$item" .
           done
 
-          rm -f .github/workflows/bootstrap-sanitized-source.yml bootstrap-debug.txt
+          rm -f bootstrap-debug.txt
           git config user.name github-actions[bot]
           git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add -A
