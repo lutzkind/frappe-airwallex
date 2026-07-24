@@ -7,6 +7,7 @@ from collections.abc import Iterable
 from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
 from typing import Any
+from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 
 def canonical_json(value: Any) -> str:
@@ -40,6 +41,17 @@ def iso_to_date(value: str | None) -> str:
         return datetime.fromisoformat(text).date().isoformat()
     except ValueError:
         return str(value)[:10]
+
+
+def as_utc_iso(value: datetime, timezone_name: str = "UTC") -> str:
+    moment = value
+    if moment.tzinfo is None:
+        try:
+            timezone = ZoneInfo(timezone_name or "UTC")
+        except (ValueError, ZoneInfoNotFoundError):
+            timezone = UTC
+        moment = moment.replace(tzinfo=timezone)
+    return moment.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
 def normalize_text(value: Any) -> str:

@@ -2,6 +2,14 @@
 
 All notable changes are documented here.
 
+## [1.0.5] - 2026-07-24
+
+### Fixed
+
+- Convert timezone-naive Frappe `Datetime` sync cursors from the configured site timezone to UTC before calling Airwallex.
+- Prevent `invalid_argument` failures when incremental Spend expense synchronization sends `from_created_at`.
+- Add regression tests for site-local and timezone-aware timestamp normalization.
+
 ## [1.0.4] - 2026-07-24
 
 ### Added

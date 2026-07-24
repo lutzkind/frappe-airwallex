@@ -13,6 +13,7 @@ from airwallex_erpnext.services.expenses import sync_expenses
 from airwallex_erpnext.services.fx import sync_fx
 from airwallex_erpnext.services.reimbursements import sync_reimbursements
 from airwallex_erpnext.services.transfers import sync_transfers
+from airwallex_erpnext.utils import as_utc_iso
 
 
 def run_sync(settings_name: str, module: str = "all", dry_run: bool = False) -> dict[str, Any]:
@@ -56,13 +57,14 @@ def run_sync(settings_name: str, module: str = "all", dry_run: bool = False) -> 
 
 def _start_time(settings, module: str) -> str:
     now = datetime.now(UTC)
+    timezone_name = frappe.utils.get_system_timezone() or "UTC"
     if module in {"incremental", "all"} and settings.last_successful_sync:
         start = settings.last_successful_sync - timedelta(hours=int(settings.overlap_hours or 24))
     elif settings.sync_start_date:
-        start = datetime.combine(settings.sync_start_date, datetime.min.time(), tzinfo=UTC)
+        start = datetime.combine(settings.sync_start_date, datetime.min.time())
     else:
         start = now - timedelta(days=30)
-    return start.isoformat().replace("+00:00", "Z")
+    return as_utc_iso(start, timezone_name)
 
 
 def _modules(module: str) -> set[str]:
