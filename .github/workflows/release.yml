@@ -108,7 +108,7 @@ jobs:
               })).data;
             }
 
-            await github.rest.repos.replaceAllRepositoryTopics({ owner, repo, names: topics });
+            await github.rest.repos.replaceAllTopics({ owner, repo, names: topics });
 
             const tagRef = (await github.rest.git.getRef({ owner, repo, ref: `tags/${tag}` })).data;
             const verifiedRelease = (await github.rest.repos.getReleaseByTag({ owner, repo, tag })).data;
