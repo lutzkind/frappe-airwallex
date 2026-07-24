@@ -1,0 +1,133 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Sync Log",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "module",
+    "status",
+    "started_at",
+    "finished_at",
+    "records_discovered",
+    "records_created",
+    "records_updated",
+    "records_held",
+    "error",
+    "result_json"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "module",
+      "label": "Module",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Running\nSuccess\nFailed\nPartial",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "started_at",
+      "label": "Started At",
+      "fieldtype": "Datetime"
+    },
+    {
+      "fieldname": "finished_at",
+      "label": "Finished At",
+      "fieldtype": "Datetime"
+    },
+    {
+      "fieldname": "records_discovered",
+      "label": "Discovered",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "records_created",
+      "label": "Created",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "records_updated",
+      "label": "Updated",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "records_held",
+      "label": "Held",
+      "fieldtype": "Int"
+    },
+    {
+      "fieldname": "error",
+      "label": "Error",
+      "fieldtype": "Long Text"
+    },
+    {
+      "fieldname": "result_json",
+      "label": "Result",
+      "fieldtype": "Code",
+      "options": "JSON"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "write": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "hash",
+  "title_field": "module"
+}

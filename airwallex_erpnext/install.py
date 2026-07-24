@@ -85,7 +85,14 @@ def create_roles():
 
 
 def create_fields():
-    available = {doctype: fields for doctype, fields in CUSTOM_FIELDS.items() if frappe.db.exists("DocType", doctype)}
+    # HRMS-owned DocTypes such as Expense Claim are optional in ERPNext v16.
+    # Install all available integration fields without making the whole app
+    # installation fail when an optional app is absent.
+    available = {
+        doctype: fields
+        for doctype, fields in CUSTOM_FIELDS.items()
+        if frappe.db.exists("DocType", doctype)
+    }
     create_custom_fields(available, update=True)
 
 
@@ -93,22 +100,31 @@ def create_workspace():
     name = "Airwallex Banking"
     if frappe.db.exists("Workspace", name):
         return
-    doc = frappe.get_doc({
-        "doctype": "Workspace", "title": name, "label": name, "module": "Airwallex ERPNext", "public": 1,
-        "is_hidden": 0, "icon": "bank", "content": "[]",
-        "links": [
-            {"type": "Link", "label": "Settings", "link_type": "DocType", "link_to": "Airwallex Settings"},
-            {"type": "Link", "label": "Account Mappings", "link_type": "DocType", "link_to": "Airwallex Account Mapping"},
-            {"type": "Link", "label": "Mapping Rules", "link_type": "DocType", "link_to": "Airwallex Mapping Rule"},
-            {"type": "Link", "label": "Webhook Events", "link_type": "DocType", "link_to": "Airwallex Webhook Event"},
-            {"type": "Link", "label": "Sync Logs", "link_type": "DocType", "link_to": "Airwallex Sync Log"},
-            {"type": "Link", "label": "Reconciliation Proposals", "link_type": "DocType", "link_to": "Airwallex Reconciliation Proposal"},
-            {"type": "Link", "label": "Receipt Matches", "link_type": "DocType", "link_to": "Airwallex Receipt Match"},
-            {"type": "Link", "label": "Bank Transactions", "link_type": "DocType", "link_to": "Bank Transaction"},
-        ],
-    })
+    doc = frappe.get_doc(
+        {
+            "doctype": "Workspace",
+            "title": name,
+            "label": name,
+            "module": "Airwallex ERPNext",
+            "public": 1,
+            "is_hidden": 0,
+            "icon": "bank",
+            "content": "[]",
+            "links": [
+                {"type": "Link", "label": "Settings", "link_type": "DocType", "link_to": "Airwallex Settings"},
+                {"type": "Link", "label": "Account Mappings", "link_type": "DocType", "link_to": "Airwallex Account Mapping"},
+                {"type": "Link", "label": "Mapping Rules", "link_type": "DocType", "link_to": "Airwallex Mapping Rule"},
+                {"type": "Link", "label": "Webhook Events", "link_type": "DocType", "link_to": "Airwallex Webhook Event"},
+                {"type": "Link", "label": "Sync Logs", "link_type": "DocType", "link_to": "Airwallex Sync Log"},
+                {"type": "Link", "label": "Reconciliation Proposals", "link_type": "DocType", "link_to": "Airwallex Reconciliation Proposal"},
+                {"type": "Link", "label": "Receipt Matches", "link_type": "DocType", "link_to": "Airwallex Receipt Match"},
+                {"type": "Link", "label": "Bank Transactions", "link_type": "DocType", "link_to": "Bank Transaction"},
+            ],
+        }
+    )
     doc.insert(ignore_permissions=True)
 
 
 def create_default_document_types():
+    # Reserved for future seeded document types. Kept idempotent for install contracts.
     return None

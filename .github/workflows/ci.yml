@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: pip install -e '.[dev]'
+      - name: Python syntax validation
+        run: python -m compileall -q airwallex_erpnext
+      - name: Lint
+        run: ruff check .
+      - name: Unit and fixture tests
+        run: pytest
+      - name: Package build validation
+        run: python -m build
+
+  secret-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Gitleaks
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  frappe-v16-compatibility:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Check Frappe v16 source compatibility
+        run: |
+          git clone --depth 1 --branch version-16 https://github.com/frappe/frappe.git /tmp/frappe
+          PYTHONPATH="/tmp/frappe:$GITHUB_WORKSPACE" python -m compileall -q airwallex_erpnext
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          required = {"Airwallex Settings", "Airwallex Webhook Event", "Airwallex Sync Log"}
+          names = {json.loads(path.read_text())["name"] for path in Path("airwallex_erpnext").rglob("*.json") if '"doctype"' in path.read_text()}
+          assert required <= names
+          PY

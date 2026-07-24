@@ -1,0 +1,36 @@
+name: Bug report
+description: Report a reproducible problem using sanitized information
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Do not include credentials, account/card IDs, receipts, private URLs, or financial records.
+  - type: input
+    id: versions
+    attributes:
+      label: Versions
+      description: App, Frappe, ERPNext, and Python versions
+    validations:
+      required: true
+  - type: dropdown
+    id: module
+    attributes:
+      label: Module
+      options: [Banking, Spend expenses, Receipts, Bills, Payments, Reimbursements, Transfers, FX, Webhooks, Migration, Other]
+    validations:
+      required: true
+  - type: textarea
+    id: behavior
+    attributes:
+      label: What happened?
+      description: Include sanitized steps, expected behavior, and bounded error text.
+    validations:
+      required: true
+  - type: textarea
+    id: safety
+    attributes:
+      label: Posting controls and dry-run result
+      description: State which controls were enabled and whether the issue reproduces in dry-run mode.
+    validations:
+      required: true

@@ -1,0 +1,463 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Settings",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings_name",
+    "enabled",
+    "environment_section",
+    "environment",
+    "api_base_url",
+    "client_id",
+    "api_key",
+    "account_id",
+    "legal_entity_id",
+    "timeout_seconds",
+    "column_break_connection",
+    "company",
+    "default_currency",
+    "default_cost_center",
+    "default_expense_account",
+    "default_business_unit",
+    "supplier_group",
+    "default_expense_claim_type",
+    "sync_section",
+    "sync_start_date",
+    "overlap_hours",
+    "max_records_per_sync",
+    "settled_only",
+    "enable_banking",
+    "enable_expenses",
+    "enable_bills",
+    "enable_supplier_payments",
+    "enable_reimbursements",
+    "enable_fx",
+    "enable_transfers",
+    "auto_provision_currency_accounts",
+    "enable_fx_journals",
+    "posting_section",
+    "expense_posting_strategy",
+    "create_accounting_documents",
+    "submit_accounting_documents",
+    "create_suppliers",
+    "mark_expenses_synced",
+    "mark_bills_synced",
+    "webhook_section",
+    "webhook_secret",
+    "webhook_tolerance_seconds",
+    "webhook_max_attempts",
+    "webhook_version",
+    "receipt_section",
+    "receipt_provider",
+    "compatibility_secret",
+    "imap_section",
+    "imap_host",
+    "imap_port",
+    "imap_username",
+    "imap_password",
+    "imap_mailbox",
+    "status_section",
+    "last_connection_status",
+    "last_connection_test",
+    "last_successful_sync"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings_name",
+      "label": "Connection Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "enabled",
+      "label": "Enabled",
+      "fieldtype": "Check",
+      "default": "0",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "environment_section",
+      "label": "Connection",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "environment",
+      "label": "Environment",
+      "fieldtype": "Select",
+      "options": "Production\nDemo",
+      "default": "Production",
+      "reqd": 1
+    },
+    {
+      "fieldname": "api_base_url",
+      "label": "API Base URL",
+      "fieldtype": "Data",
+      "default": "https://api.airwallex.com",
+      "reqd": 1
+    },
+    {
+      "fieldname": "client_id",
+      "label": "Client ID",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "api_key",
+      "label": "API Key",
+      "fieldtype": "Password",
+      "reqd": 1
+    },
+    {
+      "fieldname": "account_id",
+      "label": "Airwallex Account / Login As",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "legal_entity_id",
+      "label": "Legal Entity ID",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "timeout_seconds",
+      "label": "HTTP Timeout Seconds",
+      "fieldtype": "Int",
+      "default": "30"
+    },
+    {
+      "fieldname": "column_break_connection",
+      "fieldtype": "Column Break"
+    },
+    {
+      "fieldname": "company",
+      "label": "ERPNext Company",
+      "fieldtype": "Link",
+      "options": "Company",
+      "reqd": 1
+    },
+    {
+      "fieldname": "default_currency",
+      "label": "Default Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": 1
+    },
+    {
+      "fieldname": "default_cost_center",
+      "label": "Default Cost Center",
+      "fieldtype": "Link",
+      "options": "Cost Center"
+    },
+    {
+      "fieldname": "default_expense_account",
+      "label": "Default Expense Account",
+      "fieldtype": "Link",
+      "options": "Account"
+    },
+    {
+      "fieldname": "default_business_unit",
+      "label": "Default Business Unit",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "supplier_group",
+      "label": "Supplier Group",
+      "fieldtype": "Link",
+      "options": "Supplier Group"
+    },
+    {
+      "fieldname": "default_expense_claim_type",
+      "label": "Default Expense Claim Type",
+      "fieldtype": "Link",
+      "options": "Expense Claim Type"
+    },
+    {
+      "fieldname": "sync_section",
+      "label": "Synchronization",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "sync_start_date",
+      "label": "Sync Start Date",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "overlap_hours",
+      "label": "Recovery Overlap Hours",
+      "fieldtype": "Int",
+      "default": "24"
+    },
+    {
+      "fieldname": "max_records_per_sync",
+      "label": "Max Records Per Sync",
+      "fieldtype": "Int",
+      "default": "5000"
+    },
+    {
+      "fieldname": "settled_only",
+      "label": "Import Settled Financial Transactions Only",
+      "fieldtype": "Check",
+      "default": "1"
+    },
+    {
+      "fieldname": "enable_banking",
+      "label": "Banking",
+      "fieldtype": "Check",
+      "default": "1"
+    },
+    {
+      "fieldname": "enable_expenses",
+      "label": "Card Expenses",
+      "fieldtype": "Check",
+      "default": "1"
+    },
+    {
+      "fieldname": "enable_bills",
+      "label": "Bills",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "enable_supplier_payments",
+      "label": "Supplier Payments",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "enable_reimbursements",
+      "label": "Reimbursements",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "enable_fx",
+      "label": "FX Discovery",
+      "fieldtype": "Check",
+      "default": "1"
+    },
+    {
+      "fieldname": "enable_transfers",
+      "label": "Transfers / Payouts",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "auto_provision_currency_accounts",
+      "label": "Auto-provision Currency Accounts",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "enable_fx_journals",
+      "label": "Create FX Journal Entries",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "posting_section",
+      "label": "Accounting Posting",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "expense_posting_strategy",
+      "label": "Expense Strategy",
+      "fieldtype": "Select",
+      "options": "Bank Transaction Only\nPurchase Invoice\nPaid Purchase Invoice\nExpense Claim",
+      "default": "Bank Transaction Only"
+    },
+    {
+      "fieldname": "create_accounting_documents",
+      "label": "Create Accounting Documents",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "submit_accounting_documents",
+      "label": "Submit Accounting Documents",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "create_suppliers",
+      "label": "Create Missing Suppliers",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "mark_expenses_synced",
+      "label": "Mark Expenses Synced in Airwallex",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "mark_bills_synced",
+      "label": "Mark Bills Synced in Airwallex",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "webhook_section",
+      "label": "Webhooks",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "webhook_secret",
+      "label": "Webhook Secret",
+      "fieldtype": "Password"
+    },
+    {
+      "fieldname": "webhook_tolerance_seconds",
+      "label": "Replay Tolerance Seconds",
+      "fieldtype": "Int",
+      "default": "300"
+    },
+    {
+      "fieldname": "webhook_max_attempts",
+      "label": "Max Processing Attempts",
+      "fieldtype": "Int",
+      "default": "5"
+    },
+    {
+      "fieldname": "webhook_version",
+      "label": "Webhook API Version",
+      "fieldtype": "Data",
+      "default": "2025-11-11"
+    },
+    {
+      "fieldname": "receipt_section",
+      "label": "Receipts",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "receipt_provider",
+      "label": "Receipt Provider",
+      "fieldtype": "Select",
+      "options": "Airwallex\nCompatibility API\nIMAP\nManual\nDisabled",
+      "default": "Compatibility API"
+    },
+    {
+      "fieldname": "compatibility_secret",
+      "label": "Windmill Compatibility Secret",
+      "fieldtype": "Password"
+    },
+    {
+      "fieldname": "imap_section",
+      "label": "Optional IMAP Receipt Provider",
+      "fieldtype": "Section Break",
+      "depends_on": "eval:doc.receipt_provider=='IMAP'"
+    },
+    {
+      "fieldname": "imap_host",
+      "label": "IMAP Host",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "imap_port",
+      "label": "IMAP Port",
+      "fieldtype": "Int",
+      "default": "993"
+    },
+    {
+      "fieldname": "imap_username",
+      "label": "IMAP Username",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "imap_password",
+      "label": "IMAP Password",
+      "fieldtype": "Password"
+    },
+    {
+      "fieldname": "imap_mailbox",
+      "label": "Mailbox",
+      "fieldtype": "Data",
+      "default": "INBOX"
+    },
+    {
+      "fieldname": "status_section",
+      "label": "Status",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "last_connection_status",
+      "label": "Connection Status",
+      "fieldtype": "Data",
+      "read_only": 1
+    },
+    {
+      "fieldname": "last_connection_test",
+      "label": "Last Connection Test",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    },
+    {
+      "fieldname": "last_successful_sync",
+      "label": "Last Successful Sync",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "field:settings_name",
+  "title_field": "settings_name",
+  "search_fields": "settings_name,account_id,company"
+}

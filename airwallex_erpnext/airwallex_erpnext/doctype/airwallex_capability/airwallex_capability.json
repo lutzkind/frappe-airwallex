@@ -1,0 +1,97 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Capability",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "capability",
+    "status",
+    "message",
+    "last_checked"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "capability",
+      "label": "Capability",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Available\nUnavailable\nBeta\nMissing Permission\nNot Configured\nError",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "message",
+      "label": "Message",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "last_checked",
+      "label": "Last Checked",
+      "fieldtype": "Datetime"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "write": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "format:{settings}-{capability}",
+  "title_field": "capability"
+}

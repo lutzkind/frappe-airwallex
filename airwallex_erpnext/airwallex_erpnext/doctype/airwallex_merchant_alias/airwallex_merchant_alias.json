@@ -1,0 +1,117 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Merchant Alias",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "alias",
+    "normalized_alias",
+    "supplier",
+    "enabled",
+    "confirmed"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "alias",
+      "label": "Merchant Alias",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "normalized_alias",
+      "label": "Normalized Alias",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1
+    },
+    {
+      "fieldname": "supplier",
+      "label": "Supplier",
+      "fieldtype": "Link",
+      "options": "Supplier",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "enabled",
+      "label": "Enabled",
+      "fieldtype": "Check",
+      "default": "1"
+    },
+    {
+      "fieldname": "confirmed",
+      "label": "Confirmed",
+      "fieldtype": "Check",
+      "default": "0"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "hash",
+  "title_field": "alias",
+  "search_fields": "alias,normalized_alias,supplier"
+}

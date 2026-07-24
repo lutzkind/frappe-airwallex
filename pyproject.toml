@@ -5,31 +5,16 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "airwallex-erpnext"
 version = "1.0.4"
-description = "Community Airwallex banking, spend management, and accounting integration for Frappe and ERPNext."
+description = "Community Airwallex banking and spend integration for Frappe and ERPNext"
 readme = "README.md"
 requires-python = ">=3.12"
-license = { text = "GPL-3.0-or-later" }
+license = { text = "GPL-3.0-only" }
 authors = [{ name = "Frappe Airwallex contributors" }]
-keywords = ["frappe", "erpnext", "airwallex", "banking", "accounting", "spend-management", "payments"]
-classifiers = [
-  "Development Status :: 4 - Beta",
-  "Framework :: Frappe",
-  "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-  "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.12",
-  "Programming Language :: Python :: 3.13",
-  "Programming Language :: Python :: 3.14",
-]
 dependencies = []
-
-[project.optional-dependencies]
-dev = ["build>=1.2", "pytest>=8", "ruff>=0.9"]
 
 [project.urls]
 Homepage = "https://github.com/lutzkind/frappe-airwallex"
-Documentation = "https://github.com/lutzkind/frappe-airwallex/tree/main/docs"
 Issues = "https://github.com/lutzkind/frappe-airwallex/issues"
-Source = "https://github.com/lutzkind/frappe-airwallex"
 
 [tool.setuptools]
 include-package-data = true
@@ -41,10 +26,13 @@ include = ["airwallex_erpnext*"]
 testpaths = ["airwallex_erpnext/tests"]
 addopts = "-q"
 
+[project.optional-dependencies]
+dev = ["build>=1.2", "pytest>=8.0", "ruff>=0.6"]
+
 [tool.ruff]
 target-version = "py312"
-line-length = 140
+line-length = 120
 
 [tool.ruff.lint]
-select = ["E4", "E7", "E9", "F", "I"]
+select = ["E", "F", "I", "UP"]
 ignore = ["E501"]

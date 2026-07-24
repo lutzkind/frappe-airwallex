@@ -1,0 +1,207 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Mapping Rule",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "rule_name",
+    "settings",
+    "enabled",
+    "priority",
+    "resource_type",
+    "match_section",
+    "match_field",
+    "operator",
+    "match_value",
+    "output_section",
+    "company",
+    "cost_center",
+    "project",
+    "expense_account",
+    "supplier",
+    "tax_template",
+    "item_code",
+    "business_unit",
+    "stop_processing"
+  ],
+  "fields": [
+    {
+      "fieldname": "rule_name",
+      "label": "Rule Name",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "enabled",
+      "label": "Enabled",
+      "fieldtype": "Check",
+      "default": "1",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "priority",
+      "label": "Priority",
+      "fieldtype": "Int",
+      "default": "100",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "resource_type",
+      "label": "Resource Type",
+      "fieldtype": "Select",
+      "options": "Any\nFinancial Transaction\nExpense\nBill\nReimbursement\nPayment\nFX",
+      "default": "Any"
+    },
+    {
+      "fieldname": "match_section",
+      "label": "Match",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "match_field",
+      "label": "Field",
+      "fieldtype": "Data",
+      "reqd": 1
+    },
+    {
+      "fieldname": "operator",
+      "label": "Operator",
+      "fieldtype": "Select",
+      "options": "Equals\nContains\nStarts With\nRegex\nAny",
+      "default": "Equals",
+      "reqd": 1
+    },
+    {
+      "fieldname": "match_value",
+      "label": "Value",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "output_section",
+      "label": "Outputs",
+      "fieldtype": "Section Break"
+    },
+    {
+      "fieldname": "company",
+      "label": "Company",
+      "fieldtype": "Link",
+      "options": "Company"
+    },
+    {
+      "fieldname": "cost_center",
+      "label": "Cost Center",
+      "fieldtype": "Link",
+      "options": "Cost Center"
+    },
+    {
+      "fieldname": "project",
+      "label": "Project",
+      "fieldtype": "Link",
+      "options": "Project"
+    },
+    {
+      "fieldname": "expense_account",
+      "label": "Expense Account",
+      "fieldtype": "Link",
+      "options": "Account"
+    },
+    {
+      "fieldname": "supplier",
+      "label": "Supplier",
+      "fieldtype": "Link",
+      "options": "Supplier"
+    },
+    {
+      "fieldname": "tax_template",
+      "label": "Tax Template",
+      "fieldtype": "Link",
+      "options": "Purchase Taxes and Charges Template"
+    },
+    {
+      "fieldname": "item_code",
+      "label": "Item",
+      "fieldtype": "Link",
+      "options": "Item"
+    },
+    {
+      "fieldname": "business_unit",
+      "label": "Business Unit",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "stop_processing",
+      "label": "Stop After Match",
+      "fieldtype": "Check",
+      "default": "1"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "field:rule_name",
+  "title_field": "rule_name",
+  "search_fields": "rule_name,match_field,match_value"
+}

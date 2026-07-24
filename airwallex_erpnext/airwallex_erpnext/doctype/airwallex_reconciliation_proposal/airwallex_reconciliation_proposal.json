@@ -1,0 +1,117 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Reconciliation Proposal",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "bank_transaction",
+    "reference_doctype",
+    "reference_name",
+    "score",
+    "reasons",
+    "status"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "bank_transaction",
+      "label": "Bank Transaction",
+      "fieldtype": "Link",
+      "options": "Bank Transaction",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "reference_doctype",
+      "label": "Reference DocType",
+      "fieldtype": "Link",
+      "options": "DocType",
+      "reqd": 1
+    },
+    {
+      "fieldname": "reference_name",
+      "label": "Reference Name",
+      "fieldtype": "Dynamic Link",
+      "options": "reference_doctype",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "score",
+      "label": "Score",
+      "fieldtype": "Int",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "reasons",
+      "label": "Reasons",
+      "fieldtype": "Small Text"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Proposed\nAccepted\nRejected\nApplied\nConflict",
+      "default": "Proposed",
+      "in_list_view": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "write": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "hash",
+  "title_field": "reference_name"
+}

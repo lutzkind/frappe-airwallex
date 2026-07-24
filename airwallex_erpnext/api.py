@@ -31,6 +31,9 @@ def webhook():
     timestamp = request.headers.get("x-timestamp", "")
     signature = request.headers.get("x-signature", "")
 
+    # Verify the original bytes before JSON parsing. Each Airwallex webhook URL has
+    # its own secret; for multi-connection sites we try enabled connections until
+    # one validates. A failed request is never parsed or persisted.
     settings = _verify_against_enabled_connections(raw, timestamp, signature)
     try:
         preview = json.loads(raw.decode("utf-8"))
@@ -65,6 +68,7 @@ def ingest_compatibility_receipt():
     return ingest_receipt(settings, payload)
 
 
+
 @frappe.whitelist()
 def migration_report(settings: str, apply: int = 0):
     frappe.only_for(("System Manager", "Airwallex Administrator"))
@@ -84,7 +88,6 @@ def propose_reconciliation(bank_transaction: str):
     frappe.only_for(("System Manager", "Airwallex Administrator", "Airwallex Accountant", "Airwallex Reviewer"))
     from airwallex_erpnext.services.reconciliation import propose_for_bank_transaction
     return [candidate.__dict__ for candidate in propose_for_bank_transaction(bank_transaction)]
-
 
 def _verify_against_enabled_connections(raw: bytes, timestamp: str, signature: str):
     settings_names = frappe.get_all(

@@ -1,0 +1,118 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Receipt Match",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "expense_id",
+    "bank_transaction",
+    "source_provider",
+    "source_message_id",
+    "confidence",
+    "status",
+    "details"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "expense_id",
+      "label": "Expense ID",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "bank_transaction",
+      "label": "Bank Transaction",
+      "fieldtype": "Link",
+      "options": "Bank Transaction",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "source_provider",
+      "label": "Source Provider",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "source_message_id",
+      "label": "Source Message ID",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "confidence",
+      "label": "Confidence",
+      "fieldtype": "Float"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Proposed\nAttached\nHeld\nRejected",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "details",
+      "label": "Details",
+      "fieldtype": "Code",
+      "options": "JSON"
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "write": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "hash",
+  "title_field": "expense_id"
+}

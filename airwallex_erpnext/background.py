@@ -28,6 +28,7 @@ def _settings(settings: str):
 
 
 def _compact(value: Any, depth: int = 0) -> Any:
+    """Return a bounded, non-secret summary suitable for polling APIs."""
     if depth > 4:
         return "<nested>"
     if value is None or isinstance(value, (bool, int, float)):
@@ -60,6 +61,7 @@ def _set_state(job_id: str, state: dict[str, Any]) -> None:
 
 @frappe.whitelist()
 def enqueue_sync(settings: str, module: str = "all", dry_run: int | str | bool = 1) -> dict[str, Any]:
+    """Queue a potentially long Airwallex sync instead of blocking a web worker."""
     doc = _settings(settings)
     doc.check_permission("write")
 
@@ -90,10 +92,21 @@ def enqueue_sync(settings: str, module: str = "all", dry_run: int | str | bool =
         external_job_id=external_job_id,
         requested_by=frappe.session.user,
     )
-    return {**state, "rq_job_id": getattr(job, "id", None), "queue": "long", "timeout_seconds": 3600}
+    return {
+        **state,
+        "rq_job_id": getattr(job, "id", None),
+        "queue": "long",
+        "timeout_seconds": 3600,
+    }
 
 
-def run_sync_job(settings: str, module: str, dry_run: bool, external_job_id: str, requested_by: str | None = None) -> dict[str, Any]:
+def run_sync_job(
+    settings: str,
+    module: str,
+    dry_run: bool,
+    external_job_id: str,
+    requested_by: str | None = None,
+) -> dict[str, Any]:
     from airwallex_erpnext.services.sync import run_sync
 
     state = {
@@ -109,19 +122,40 @@ def run_sync_job(settings: str, module: str, dry_run: bool, external_job_id: str
     _set_state(external_job_id, state)
     try:
         result = run_sync(settings, module=module, dry_run=bool(dry_run))
-        state.update({"status": "finished", "finished_at": frappe.utils.now_datetime(), "result_summary": _compact(result)})
+        state.update(
+            {
+                "status": "finished",
+                "finished_at": frappe.utils.now_datetime(),
+                "result_summary": _compact(result),
+            }
+        )
         _set_state(external_job_id, state)
         return result
     except Exception as exc:
-        state.update({"ok": False, "status": "failed", "finished_at": frappe.utils.now_datetime(), "error_type": type(exc).__name__, "error": str(exc)[:2000]})
+        state.update(
+            {
+                "ok": False,
+                "status": "failed",
+                "finished_at": frappe.utils.now_datetime(),
+                "error_type": type(exc).__name__,
+                "error": str(exc)[:2000],
+            }
+        )
         _set_state(external_job_id, state)
         raise
 
 
 @frappe.whitelist()
 def sync_job_status(settings: str, job_id: str, include_result: int | str | bool = 0) -> dict[str, Any]:
+    """Return a bounded job state. Full results are opt-in and available only while RQ retains them."""
     _settings(settings)
-    state = frappe.cache.get_value(_cache_key(job_id)) or {"ok": False, "job_id": job_id, "settings": settings, "status": "unknown"}
+    state = frappe.cache.get_value(_cache_key(job_id)) or {
+        "ok": False,
+        "job_id": job_id,
+        "settings": settings,
+        "status": "unknown",
+    }
+
     job = get_job(job_id)
     if job:
         status = job.get_status(refresh=True)

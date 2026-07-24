@@ -1,0 +1,172 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Webhook Event",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "event_id",
+    "event_name",
+    "account_id",
+    "api_version",
+    "event_created_at",
+    "status",
+    "attempts",
+    "duplicate_event",
+    "received_timestamp",
+    "signature_prefix",
+    "payload_hash",
+    "processed_at",
+    "last_error",
+    "result_json",
+    "raw_payload"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "event_id",
+      "label": "Event ID",
+      "fieldtype": "Data",
+      "reqd": 1,
+      "unique": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "event_name",
+      "label": "Event Name",
+      "fieldtype": "Data",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "account_id",
+      "label": "Account ID",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "api_version",
+      "label": "API Version",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "event_created_at",
+      "label": "Event Created At",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "status",
+      "label": "Status",
+      "fieldtype": "Select",
+      "options": "Received\nProcessing\nRetrying\nProcessed\nIgnored\nFailed\nDead Letter",
+      "default": "Received",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "attempts",
+      "label": "Attempts",
+      "fieldtype": "Int",
+      "default": "0"
+    },
+    {
+      "fieldname": "duplicate_event",
+      "label": "Duplicate Delivery Seen",
+      "fieldtype": "Check",
+      "default": "0"
+    },
+    {
+      "fieldname": "received_timestamp",
+      "label": "Signature Timestamp",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "signature_prefix",
+      "label": "Signature Prefix",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "payload_hash",
+      "label": "Payload Hash",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "processed_at",
+      "label": "Processed At",
+      "fieldtype": "Datetime"
+    },
+    {
+      "fieldname": "last_error",
+      "label": "Last Error",
+      "fieldtype": "Long Text"
+    },
+    {
+      "fieldname": "result_json",
+      "label": "Result",
+      "fieldtype": "Code",
+      "options": "JSON"
+    },
+    {
+      "fieldname": "raw_payload",
+      "label": "Raw Payload",
+      "fieldtype": "Code",
+      "options": "JSON",
+      "reqd": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "write": 1,
+      "report": 1,
+      "export": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "hash",
+  "title_field": "event_name",
+  "search_fields": "event_id,event_name,account_id"
+}
