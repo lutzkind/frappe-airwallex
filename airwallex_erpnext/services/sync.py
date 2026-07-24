@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import frappe
 
 from airwallex_erpnext.frappe_support import get_client, get_settings, log_sync
-from airwallex_erpnext.services.banking import sync_financial_transactions
 from airwallex_erpnext.services.balances import sync_balances
+from airwallex_erpnext.services.banking import sync_financial_transactions
 from airwallex_erpnext.services.bills import sync_bills
 from airwallex_erpnext.services.expenses import sync_expenses
 from airwallex_erpnext.services.fx import sync_fx
@@ -20,7 +20,6 @@ def run_sync(settings_name: str, module: str = "all", dry_run: bool = False) -> 
     if not settings.enabled:
         return {"ok": False, "status": "disabled", "settings": settings.name}
     client = get_client(settings)
-    started = frappe.utils.now_datetime()
     log = log_sync(settings.name, module, "Running")
     from_created_at = _start_time(settings, module)
     max_items = int(settings.max_records_per_sync or 5000)
@@ -56,11 +55,11 @@ def run_sync(settings_name: str, module: str = "all", dry_run: bool = False) -> 
 
 
 def _start_time(settings, module: str) -> str:
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     if module in {"incremental", "all"} and settings.last_successful_sync:
         start = settings.last_successful_sync - timedelta(hours=int(settings.overlap_hours or 24))
     elif settings.sync_start_date:
-        start = datetime.combine(settings.sync_start_date, datetime.min.time(), tzinfo=timezone.utc)
+        start = datetime.combine(settings.sync_start_date, datetime.min.time(), tzinfo=UTC)
     else:
         start = now - timedelta(days=30)
     return start.isoformat().replace("+00:00", "Z")

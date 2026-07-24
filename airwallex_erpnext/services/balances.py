@@ -43,7 +43,6 @@ def provision_mapping(settings, currency: str) -> str:
     if not settings.auto_provision_currency_accounts:
         raise ValueError(f"No mapping exists for {currency} and automatic provisioning is disabled")
 
-    company_abbr = frappe.db.get_value("Company", settings.company, "abbr")
     parent = frappe.db.get_value(
         "Account",
         {"company": settings.company, "root_type": "Asset", "account_type": "Bank", "is_group": 1},

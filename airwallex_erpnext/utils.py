@@ -3,9 +3,10 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from datetime import datetime, timezone
+from collections.abc import Iterable
+from datetime import UTC, datetime
 from decimal import Decimal, InvalidOperation
-from typing import Any, Iterable
+from typing import Any
 
 
 def canonical_json(value: Any) -> str:
@@ -33,7 +34,7 @@ def as_float(value: Any) -> float:
 
 def iso_to_date(value: str | None) -> str:
     if not value:
-        return datetime.now(timezone.utc).date().isoformat()
+        return datetime.now(UTC).date().isoformat()
     text = str(value).replace("Z", "+00:00")
     try:
         return datetime.fromisoformat(text).date().isoformat()

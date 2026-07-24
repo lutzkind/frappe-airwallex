@@ -6,7 +6,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 from dataclasses import dataclass, field
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from airwallex_erpnext.exceptions import (
     AirwallexAPIError,

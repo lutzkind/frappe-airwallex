@@ -2,7 +2,8 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Any, Iterable
+from collections.abc import Iterable
+from typing import Any
 
 from airwallex_erpnext.utils import normalize_merchant, normalize_text
 
