@@ -1,6 +1,0 @@
-  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
-                                 Dload  Upload   Total   Spent    Left  Speed
-  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0100 45238  100 45238    0     0   124k      0 --:--:-- --:--:-- --:--:--  124k
-/home/runner/work/_temp/source-artifact/_temp/frappe-airwallex-sanitized.tar.gz: OK
-
-import_outcome=failure
