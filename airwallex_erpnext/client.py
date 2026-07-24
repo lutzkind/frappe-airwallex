@@ -5,8 +5,8 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
-from dataclasses import dataclass, field
 from collections.abc import Iterable
+from dataclasses import dataclass, field
 from typing import Any
 
 from airwallex_erpnext.exceptions import (
