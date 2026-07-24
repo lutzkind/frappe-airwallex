@@ -37,8 +37,9 @@ jobs:
             find "$artifact_dir" -maxdepth 5 -type f -printf 'artifact_file=%P\n' | sort
           fi
 
-          tar_path="$artifact_dir/frappe-airwallex-sanitized.tar.gz"
-          if [ "$status" -eq 0 ] && [ -f "$tar_path" ]; then
+          tar_path="$artifact_dir/_temp/frappe-airwallex-sanitized.tar.gz"
+          audit_path="$artifact_dir/control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence/sanitized-audit.json"
+          if [ "$status" -eq 0 ] && [ -f "$tar_path" ] && [ -f "$audit_path" ]; then
             echo "stage=untar"
             tar -xzf "$tar_path" -C "$source_dir" || status=$?
             find "$source_dir" -maxdepth 3 -type f -printf 'source_file=%P\n' | sort
