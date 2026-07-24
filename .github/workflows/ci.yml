@@ -65,8 +65,10 @@ jobs:
           python-version: "3.12"
       - name: Check Frappe v16 source compatibility
         run: |
-          git clone --depth 1 --branch version-16 https://github.com/frappe/frappe.git /tmp/frappe
-          PYTHONPATH="/tmp/frappe:$GITHUB_WORKSPACE" python -m compileall -q airwallex_erpnext
+          frappe_dir="$(mktemp -d "${RUNNER_TEMP}/frappe.XXXXXX")"
+          trap 'rm -rf "$frappe_dir"' EXIT
+          git clone --depth 1 --branch version-16 https://github.com/frappe/frappe.git "$frappe_dir"
+          PYTHONPATH="$frappe_dir:$GITHUB_WORKSPACE" python -m compileall -q airwallex_erpnext
           python - <<'PY'
           import json
           from pathlib import Path
