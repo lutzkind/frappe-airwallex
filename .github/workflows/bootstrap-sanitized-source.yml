@@ -18,7 +18,7 @@ jobs:
       - name: Import audited standalone source
         shell: bash
         env:
-          SOURCE_ARTIFACT_URL: "https://productionresultssa2.blob.core.windows.net/actions-results/47588121-994d-4874-825f-5a687188d8f6/workflow-job-run-cc264dbf-7d02-5bee-b517-dbc6e5921667/artifacts/dd0d7b683223136f209b9e80d6d76f8bf5a678e9debd2b99af2791875f83598a.zip?rscd=attachment%3B+filename%3D%22frappe-airwallex-sanitized.zip%22&rsct=application%2Fzip&se=2026-07-24T08%3A07%3A58Z&sig=VD3Xdq7ytRFakcvuEAjhhb3%2BkzTPHdZIMLVNLGA3MGA%3D&ske=2026-07-24T10%3A02%3A45Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&sks=b&skt=2026-07-24T06%3A02%3A45Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-11-05&sp=r&spr=https&sr=b&st=2026-07-24T07%3A57%3A53Z&sv=2025-11-05"
+          SOURCE_ARTIFACT_URL: "https://productionresultssa2.blob.core.windows.net/actions-results/47588121-994d-4874-825f-5a687188d8f6/workflow-job-run-cc264dbf-7d02-5bee-b517-dbc6e5921667/artifacts/dd0d7b683223136f209b9e80d6d76f8bf5a678e9debd2b99af2791875f83598a.zip?rscd=attachment%3B+filename%3D%22frappe-airwallex-sanitized.zip%22&rsct=application%2Fzip&se=2026-07-24T08%3A07%3A58Z&sig=VD3Xdq7ytRFakcvuEAjhhb3%2BkzTPHdZIMLVNLGA3MGA%3D&ske=2026-07-24T10%3A02%3A45Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&spo=r&skt=2026-07-24T06%3A02%3A45Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-11-05&sp=r&spr=https&sr=b&st=2026-07-24T07%3A57%3A53Z&sv=2025-11-05"
         run: |
           set -euo pipefail
           artifact_dir="$RUNNER_TEMP/source-artifact"
@@ -30,7 +30,14 @@ jobs:
 
           test "$(cat "$source_dir/airwallex_erpnext/__init__.py")" = '__version__ = "1.0.4"'
           grep -q '^version = "1.0.4"$' "$source_dir/pyproject.toml"
-          test "$(python3 -c 'import json; print(json.load(open("'$artifact_dir'/tmp/frappe-airwallex-evidence/sanitized-audit.json"))["finding_count"])')" = "0"
+          python3 - "$artifact_dir/tmp/frappe-airwallex-evidence/sanitized-audit.json" <<'PY'
+          import json
+          import sys
+          with open(sys.argv[1], encoding="utf-8") as handle:
+              report = json.load(handle)
+          if report.get("finding_count") != 0:
+              raise SystemExit(f"sanitization findings remain: {report}")
+          PY
 
           shopt -s dotglob nullglob
           for item in "$source_dir"/*; do
