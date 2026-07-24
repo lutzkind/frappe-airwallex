@@ -27,13 +27,17 @@ jobs:
           mkdir -p "$artifact_dir" "$source_dir"
 
           curl --fail --location --retry 3 "$SOURCE_ARTIFACT_URL" --output "$RUNNER_TEMP/source.zip"
-          echo "$SOURCE_ARTIFACT_SHA256  $RUNNER_TEMP/source.zip" | sha256sum --check --strict
           unzip -q "$RUNNER_TEMP/source.zip" -d "$artifact_dir"
 
           tar_path="$artifact_dir/_temp/frappe-airwallex-sanitized.tar.gz"
-          audit_path="$artifact_dir/control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence/sanitized-audit.json"
+          evidence_dir="$artifact_dir/control-center-dashboard/control-center-dashboard/tmp/frappe-airwallex-evidence"
+          audit_path="$evidence_dir/sanitized-audit.json"
+          checksum_path="$evidence_dir/sanitized-archive.sha256"
           test -f "$tar_path"
           test -f "$audit_path"
+          test -f "$checksum_path"
+          expected_tar_sha="$(awk '{print $1}' "$checksum_path")"
+          echo "$expected_tar_sha  $tar_path" | sha256sum --check --strict
           tar -xzf "$tar_path" -C "$source_dir"
 
           test "$(cat "$source_dir/airwallex_erpnext/__init__.py")" = '__version__ = "1.0.4"'
