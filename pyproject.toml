@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.12"
 license = { text = "GPL-3.0-only" }
 authors = [{ name = "Frappe Airwallex contributors" }]
-dependencies = []
+dependencies = ["tzdata>=2025.2"]
 
 [project.urls]
 Homepage = "https://github.com/lutzkind/frappe-airwallex"
