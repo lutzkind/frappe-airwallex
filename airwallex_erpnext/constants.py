@@ -1,0 +1,15 @@
+from __future__ import annotations
+
+DEFAULT_PRODUCTION_BASE_URL = "https://api.airwallex.com"
+DEFAULT_DEMO_BASE_URL = "https://api-demo.airwallex.com"
+MIN_SPEND_WEBHOOK_VERSION = "2025-11-11"
+
+CARD_PURCHASE_SOURCE_TYPES = {"CARD_PURCHASE"}
+EXPENSE_APPROVED_STATES = {"APPROVED", "ARCHIVED"}
+BILL_APPROVED_STATES = {"AWAITING_PAYMENT", "PAYMENT_IN_PROGRESS", "PAID", "SCHEDULED", "MARKED_AS_PAID"}
+REIMBURSEMENT_READY_STATES = {"AWAITING_PAYMENT", "PAYMENT_IN_PROGRESS", "PAID", "MARKED_AS_PAID"}
+SETTLED_FINANCIAL_STATES = {"SETTLED"}
+
+SUPPORTED_RECEIPT_PROVIDERS = {"Airwallex", "Compatibility API", "Manual", "Disabled"}
+SUPPORTED_EXPENSE_STRATEGIES = {"Bank Transaction Only", "Purchase Invoice", "Paid Purchase Invoice", "Expense Claim"}
+SUPPORTED_CONFLICT_POLICIES = {"Hold", "Update Draft", "Create Amendment Proposal"}
