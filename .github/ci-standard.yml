@@ -1,0 +1,14 @@
+standard_version: 1.0.0
+profile: frappe
+default_branch: main
+self_hosted_labels:
+  - self-hosted
+  - Linux
+  - X64
+  - ci
+  - isolated
+heavy_checks:
+  enabled: false
+custom_commands: {}
+exceptions:
+  - Token-backed Gitleaks reporting remains GitHub-hosted with same-repository protection.
