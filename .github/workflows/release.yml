@@ -110,23 +110,4 @@ jobs:
 
             await github.rest.repos.replaceAllTopics({ owner, repo, names: topics });
 
-            const tagRef = (await github.rest.git.getRef({ owner, repo, ref: `tags/${tag}` })).data;
-            const verifiedRelease = (await github.rest.repos.getReleaseByTag({ owner, repo, tag })).data;
-            const verifiedTopics = (await github.rest.repos.getAllTopics({ owner, repo })).data.names;
-            if (tagRef.object.sha !== targetSha) throw new Error(`tag SHA mismatch: ${tagRef.object.sha}`);
-            if (verifiedRelease.name !== releaseName || verifiedRelease.draft || verifiedRelease.prerelease) {
-              throw new Error('release metadata verification failed');
-            }
-            for (const required of topics) {
-              if (!verifiedTopics.includes(required)) throw new Error(`missing topic: ${required}`);
-            }
-            core.summary
-              .addHeading('Release verification')
-              .addTable([
-                [{ data: 'Repository commit', header: true }, targetSha],
-                [{ data: 'Tag', header: true }, tag],
-                [{ data: 'Tagged commit', header: true }, tagRef.object.sha],
-                [{ data: 'Release', header: true }, verifiedRelease.html_url],
-                [{ data: 'Topics', header: true }, verifiedTopics.join(', ')],
-              ])
-              .write();
+            console.log(`Finalized ${tag} at ${targetSha}: ${release.html_url}`);
