@@ -12,7 +12,6 @@ permissions:
 
 jobs:
   finalize-v1-0-4:
-    if: github.event_name == 'workflow_dispatch' || github.event.head_commit.message == 'release: finalize v1.0.4'
     runs-on: ubuntu-latest
     steps:
       - name: Finalize tag, release, and discovery metadata
