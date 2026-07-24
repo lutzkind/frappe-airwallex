@@ -12,7 +12,7 @@ permissions:
 
 jobs:
   finalize-v1-0-4:
-    runs-on: ubuntu-latest
+    runs-on: [self-hosted, Linux, X64, ci, isolated]
     steps:
       - name: Finalize tag, release, and discovery metadata
         uses: actions/github-script@v7
@@ -35,35 +35,37 @@ jobs:
               'open-source',
             ];
             const releaseName = 'Frappe Airwallex v1.0.4';
-            const releaseBody = `# Frappe Airwallex v1.0.4
-
-Initial standalone Release 1 of the unofficial community Airwallex integration for Frappe and ERPNext.
-
-## Included
-
-- Banking support for wallet balances and financial-transaction ingestion
-- Spend support for corporate-card expenses and receipt attachments
-- Bills, supplier payments, reimbursements, transfers, and FX-conversion ingestion where the Airwallex account exposes those capabilities
-- Background synchronization on the Frappe long queue, with scheduled recovery and webhook processing
-- Existing-data migration and adoption tooling designed to preserve established ERPNext records
-- Duplicate prevention, idempotent external identifiers, reconciliation support, and independent posting safeguards
-
-## Posting safeguards
-
-Accounting-document creation, accounting-document submission, supplier creation, FX journals, and Airwallex sync-status write-back remain disabled by default. Operators must validate mappings and accounting behavior before enabling any posting control.
-
-## Receipt compatibility status
-
-Native and IMAP receipt providers are included. The transitional compatibility receipt endpoint remains available for existing deployments until native receipt parity is tested in production. The related Windmill compatibility scripts must not be removed before that parity is verified.
-
-## Known limitations
-
-- Airwallex products, permissions, regions, and API availability vary by account.
-- Some supplier-payment, receipt, transfer, reimbursement, and FX representations require account-specific validation.
-- Frappe and ERPNext 16 are the supported application versions for this release.
-- Airwallex Beta APIs may change without the stability guarantees of generally available APIs.
-
-This is an unofficial community release. It is not affiliated with or endorsed by Airwallex, Frappe Technologies, or ERPNext. Marketplace approval has not been requested or granted.`;
+            const releaseBody = [
+              '# Frappe Airwallex v1.0.4',
+              '',
+              'Initial standalone Release 1 of the unofficial community Airwallex integration for Frappe and ERPNext.',
+              '',
+              '## Included',
+              '',
+              '- Banking support for wallet balances and financial-transaction ingestion',
+              '- Spend support for corporate-card expenses and receipt attachments',
+              '- Bills, supplier payments, reimbursements, transfers, and FX-conversion ingestion where the Airwallex account exposes those capabilities',
+              '- Background synchronization on the Frappe long queue, with scheduled recovery and webhook processing',
+              '- Existing-data migration and adoption tooling designed to preserve established ERPNext records',
+              '- Duplicate prevention, idempotent external identifiers, reconciliation support, and independent posting safeguards',
+              '',
+              '## Posting safeguards',
+              '',
+              'Accounting-document creation, accounting-document submission, supplier creation, FX journals, and Airwallex sync-status write-back remain disabled by default. Operators must validate mappings and accounting behavior before enabling any posting control.',
+              '',
+              '## Receipt compatibility status',
+              '',
+              'Native and IMAP receipt providers are included. The transitional compatibility receipt endpoint remains available for existing deployments until native receipt parity is tested in production. The related Windmill compatibility scripts must not be removed before that parity is verified.',
+              '',
+              '## Known limitations',
+              '',
+              '- Airwallex products, permissions, regions, and API availability vary by account.',
+              '- Some supplier-payment, receipt, transfer, reimbursement, and FX representations require account-specific validation.',
+              '- Frappe and ERPNext 16 are the supported application versions for this release.',
+              '- Airwallex Beta APIs may change without the stability guarantees of generally available APIs.',
+              '',
+              'This is an unofficial community release. It is not affiliated with or endorsed by Airwallex, Frappe Technologies, or ERPNext. Marketplace approval has not been requested or granted.',
+            ].join('\n');
 
             let tagExists = true;
             try {
