@@ -1,0 +1,62 @@
+name: Publish v1.0.5
+
+on:
+  push:
+    paths:
+      - .github/workflows/release-v1.0.5.yml
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: [self-hosted, ci, isolated]
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TARGET_SHA: e9b8cafe48516cf4f8a17ca0b37b797c3ebc60b0
+      TAG: v1.0.5
+    steps:
+      - name: Create tag and release
+        shell: bash
+        run: |
+          set -euo pipefail
+          repo="${GITHUB_REPOSITORY}"
+          existing="$(gh api "repos/${repo}/git/ref/tags/${TAG}" --jq '.object.sha' 2>/dev/null || true)"
+          if [ -z "${existing}" ]; then
+            gh api --method POST "repos/${repo}/git/refs" -f ref="refs/tags/${TAG}" -f sha="${TARGET_SHA}" >/dev/null
+          elif [ "${existing}" != "${TARGET_SHA}" ]; then
+            gh api --method PATCH "repos/${repo}/git/refs/tags/${TAG}" -f sha="${TARGET_SHA}" -F force=true >/dev/null
+          fi
+
+          cat > /tmp/release-body.md <<'EOF'
+          ## Fixed
+
+          - Convert timezone-naive Frappe sync cursors from the configured ERPNext site timezone to UTC before calling Airwallex.
+          - Prevent `invalid_argument` failures on incremental Spend expense synchronization.
+          - Add regression coverage and an explicit timezone-data dependency.
+
+          Accounting behavior is unchanged. Posting, submission, supplier creation, FX journals, and Airwallex write-back remain independently guarded and disabled by default.
+          EOF
+
+          release_id="$(gh api "repos/${repo}/releases/tags/${TAG}" --jq '.id' 2>/dev/null || true)"
+          if [ -z "${release_id}" ]; then
+            gh api --method POST "repos/${repo}/releases" \
+              -f tag_name="${TAG}" \
+              -f target_commitish="${TARGET_SHA}" \
+              -f name="Frappe Airwallex 1.0.5" \
+              -F draft=false \
+              -F prerelease=false \
+              --raw-field body="$(cat /tmp/release-body.md)" >/dev/null
+          else
+            gh api --method PATCH "repos/${repo}/releases/${release_id}" \
+              -f tag_name="${TAG}" \
+              -f target_commitish="${TARGET_SHA}" \
+              -f name="Frappe Airwallex 1.0.5" \
+              -F draft=false \
+              -F prerelease=false \
+              --raw-field body="$(cat /tmp/release-body.md)" >/dev/null
+          fi
+
+          test "$(gh api "repos/${repo}/git/ref/tags/${TAG}" --jq '.object.sha')" = "${TARGET_SHA}"
+          test "$(gh api "repos/${repo}/releases/tags/${TAG}" --jq '.draft')" = "false"
+          test "$(gh api "repos/${repo}/releases/tags/${TAG}" --jq '.prerelease')" = "false"
