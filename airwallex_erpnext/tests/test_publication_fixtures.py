@@ -18,7 +18,7 @@ def test_release_versions_match():
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__version__":
                     version = ast.literal_eval(node.value)
-    assert project["project"]["version"] == version == "1.0.4"
+    assert project["project"]["version"] == version == "1.0.5"
 
 
 def test_doctype_json_and_safe_defaults():
