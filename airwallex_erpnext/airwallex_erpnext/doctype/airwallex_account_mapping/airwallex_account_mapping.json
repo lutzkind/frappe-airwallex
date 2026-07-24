@@ -1,0 +1,138 @@
+{
+  "doctype": "DocType",
+  "name": "Airwallex Account Mapping",
+  "module": "Airwallex ERPNext",
+  "custom": 0,
+  "istable": 0,
+  "editable_grid": 1,
+  "track_changes": 1,
+  "engine": "InnoDB",
+  "field_order": [
+    "settings",
+    "enabled",
+    "currency",
+    "account_id",
+    "ledger_account",
+    "bank_account",
+    "opening_sync_date",
+    "last_balance",
+    "last_balance_at"
+  ],
+  "fields": [
+    {
+      "fieldname": "settings",
+      "label": "Settings",
+      "fieldtype": "Link",
+      "options": "Airwallex Settings",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "enabled",
+      "label": "Enabled",
+      "fieldtype": "Check",
+      "default": "1",
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "currency",
+      "label": "Currency",
+      "fieldtype": "Link",
+      "options": "Currency",
+      "reqd": 1,
+      "in_list_view": 1
+    },
+    {
+      "fieldname": "account_id",
+      "label": "Airwallex Account ID",
+      "fieldtype": "Data"
+    },
+    {
+      "fieldname": "ledger_account",
+      "label": "ERPNext Ledger Account",
+      "fieldtype": "Link",
+      "options": "Account",
+      "reqd": 1
+    },
+    {
+      "fieldname": "bank_account",
+      "label": "ERPNext Bank Account",
+      "fieldtype": "Link",
+      "options": "Bank Account",
+      "reqd": 1
+    },
+    {
+      "fieldname": "opening_sync_date",
+      "label": "Opening Sync Date",
+      "fieldtype": "Date"
+    },
+    {
+      "fieldname": "last_balance",
+      "label": "Last Airwallex Balance",
+      "fieldtype": "Currency",
+      "options": "currency",
+      "read_only": 1
+    },
+    {
+      "fieldname": "last_balance_at",
+      "label": "Balance Checked At",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    }
+  ],
+  "permissions": [
+    {
+      "role": "System Manager",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Administrator",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "delete": 1,
+      "report": 1,
+      "export": 1,
+      "share": 1,
+      "print": 1,
+      "email": 1
+    },
+    {
+      "role": "Airwallex Accountant",
+      "read": 1,
+      "write": 1,
+      "create": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Reviewer",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    },
+    {
+      "role": "Airwallex Read Only",
+      "read": 1,
+      "report": 1,
+      "export": 1,
+      "print": 1
+    }
+  ],
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "index_web_pages_for_search": 0,
+  "autoname": "format:{settings}-{currency}",
+  "title_field": "currency",
+  "search_fields": "settings,currency,ledger_account,bank_account"
+}
