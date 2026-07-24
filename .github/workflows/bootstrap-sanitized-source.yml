@@ -16,6 +16,8 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Import audited standalone source
+        id: import
+        continue-on-error: true
         shell: bash
         env:
           SOURCE_ARTIFACT_URL: "https://productionresultssa9.blob.core.windows.net/actions-results/3bfd420e-297a-4f39-909c-93df3a6d335b/workflow-job-run-79e30fb0-e580-53f1-ac32-8fa8d7312ef9/artifacts/dd0d7b683223136f209b9e80d6d76f8bf5a678e9debd2b99af2791875f83598a.zip?rscd=attachment%3B+filename%3D%22frappe-airwallex-sanitized.zip%22&rsct=application%2Fzip&se=2026-07-24T08%3A18%3A44Z&sig=5INFaB0uJNu%2BDfOMLEumWX6ucDaQTbNFXZUZvsZd3gw%3D&ske=2026-07-24T09%3A54%3A56Z&skoid=ca7593d4-ee42-46cd-af88-8b886a2f84eb&sks=b&skt=2026-07-24T05%3A54%3A56Z&sktid=398a6654-997b-47e9-b12b-9515b896b4de&skv=2025-11-05&sp=r&spr=https&sr=b&st=2026-07-24T08%3A08%3A39Z&sv=2025-11-05"
