@@ -7,6 +7,7 @@ from airwallex_erpnext.providers.receipts.manual import ManualReceiptProvider
 PROVIDERS = {
     "Airwallex": AirwallexReceiptProvider,
     "Compatibility API": CompatibilityReceiptProvider,
+    "Frappe Email Account": FrappeEmailReceiptProvider,
     "IMAP": IMAPReceiptProvider,
     "Manual": ManualReceiptProvider,
 }
