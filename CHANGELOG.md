@@ -2,6 +2,14 @@
 
 All notable changes are documented here.
 
+## [1.0.7] - 2026-07-25
+
+### Fixed
+
+- Compare receipt bytes against Frappe's MD5 `File.content_hash` instead of the integration's SHA-256 payload hash.
+- Prevent duplicate private File records when a receipt is reprocessed.
+- Remove only exact historical duplicate File rows that share the same Bank Transaction, content hash, and private file URL while preserving the identity-bearing record and physical blob.
+
 ## [1.0.6] - 2026-07-25
 
 ### Added
@@ -38,11 +46,5 @@ All notable changes are documented here.
 
 ### Compatibility
 
-- Frappe 16 and ERPNext 16.
-- Transitional compatibility receipt endpoint retained pending tested native receipt parity.
-
-### Known limitations
-
-- Airwallex product and Beta API availability varies by account and region.
-- Native receipt access and supplier-payment representations require account-specific validation.
-- Marketplace approval has not been requested or granted.
+- Frappe v16 / ERPNext v16.
+- Python 3.12+ within the versions supported by Frappe v16.

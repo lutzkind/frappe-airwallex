@@ -20,7 +20,7 @@ Bank Transactions are the safe default. Accounting-document creation, document s
 ## Installation
 
 ```bash
-bench get-app https://github.com/lutzkind/frappe-airwallex.git --branch v1.0.6
+bench get-app https://github.com/lutzkind/frappe-airwallex.git --branch v1.0.7
 bench --site your-site.example install-app airwallex_erpnext
 bench --site your-site.example migrate
 ```
