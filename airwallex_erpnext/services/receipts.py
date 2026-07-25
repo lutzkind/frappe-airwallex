@@ -185,7 +185,7 @@ def _attach_candidate(*, candidate: ReceiptCandidate, doctype: str, docname: str
     if attachment_id:
         file_doc.db_set("custom_airwallex_attachment_id", attachment_id, update_modified=False)
     if source_message_id:
-        file_doc.db_set("custom_airwallex_source_message_id", source_message_id[:255], update_modified=False)
+        file_doc.db_set("custom_airwallex_source_message_id", source_message_id[:140], update_modified=False)
     return "attached"
 
 
