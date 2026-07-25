@@ -170,7 +170,7 @@ def _select_candidates(
 
 def _attach_candidate(*, candidate: ReceiptCandidate, doctype: str, docname: str) -> str:
     metadata = candidate.metadata or {}
-    attachment_id = str(metadata.get("attachment_id") or candidate.source_id or "")[:255]
+    attachment_id = str(metadata.get("attachment_id") or candidate.source_id or "")[:140]
     source_message_id = _source_message_id(candidate)
 
     if attachment_id and frappe.db.exists("File", {"custom_airwallex_attachment_id": attachment_id}):
