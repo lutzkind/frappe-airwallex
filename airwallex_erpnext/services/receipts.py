@@ -130,7 +130,9 @@ def _select_candidates(
 ) -> tuple[list[ReceiptCandidate], list[dict[str, Any]]]:
     if not candidates:
         return [], []
-    if provider_name in {"Airwallex", "Compatibility API"}:
+    if provider_name in {"Airwallex", "Compatibility API"} or all(
+        (candidate.metadata or {}).get("provider") == "Airwallex" for candidate in candidates
+    ):
         return candidates, []
 
     groups: dict[str, list[ReceiptCandidate]] = defaultdict(list)
