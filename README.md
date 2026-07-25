@@ -20,7 +20,7 @@ Bank Transactions are the safe default. Accounting-document creation, document s
 ## Installation
 
 ```bash
-bench get-app https://github.com/lutzkind/frappe-airwallex.git --branch v1.0.4
+bench get-app https://github.com/lutzkind/frappe-airwallex.git --branch v1.0.6
 bench --site your-site.example install-app airwallex_erpnext
 bench --site your-site.example migrate
 ```
@@ -52,13 +52,9 @@ A dry run still contacts Airwallex and evaluates mappings, but it does not creat
 /api/method/airwallex_erpnext.api.migration_report
 ```
 
-The compatibility receipt endpoint remains available during migration:
+Receipt discovery, webhook processing, retries, and scheduled recovery run inside the Frappe application. Native Airwallex attachments and Frappe-managed incoming Email Accounts require no Windmill, cron wrapper, or external compatibility service.
 
-```text
-/api/method/airwallex_erpnext.api.ingest_compatibility_receipt
-```
-
-It requires a per-connection secret and is idempotent by expense, source-message, attachment, and content identifiers. It is transitional and should be removed only after native receipt parity is tested.
+The former compatibility receipt endpoint remains available only for rollback compatibility. New installations and upgraded settings do not depend on it.
 
 ## Documentation
 

@@ -40,3 +40,7 @@ Supplier creation, FX journals, expense sync write-back, and bill sync write-bac
 ## Synchronization bounds
 
 Set a start date, overlap hours, and maximum records per sync. Incremental runs use the last successful sync minus the overlap. A new connection without a start date defaults to a bounded 30-day lookback. Overlap and stable Airwallex identifiers provide recovery without duplicates.
+
+## Receipt configuration
+
+Receipt collection is managed inside Frappe. Choose **Airwallex** for native attachments, or **Airwallex + Frappe Email Account** to fall back to an incoming Frappe mailbox. The linked Email Account must have incoming email enabled and owns its own Gmail OAuth or IMAP authentication. The legacy Compatibility API value is migrated to Airwallex and requires no external script.

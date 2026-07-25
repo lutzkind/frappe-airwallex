@@ -6,7 +6,7 @@ import frappe
 
 from airwallex_erpnext.constants import EXPENSE_APPROVED_STATES
 from airwallex_erpnext.services.mappings import account_mapping, resolve
-from airwallex_erpnext.services.receipts import attach_airwallex_receipts
+from airwallex_erpnext.services.receipts import attach_provider_receipts
 from airwallex_erpnext.services.suppliers import resolve_supplier
 from airwallex_erpnext.utils import as_float, iso_to_date, payload_hash
 
@@ -67,11 +67,16 @@ def import_expense(settings, client, expense: dict[str, Any], *, dry_run: bool =
     if strategy != "Bank Transaction Only":
         accounting = _create_accounting_document(settings, expense, mapped, bank_transaction, strategy, dry_run=dry_run)
 
-    receipt = {"attached": 0, "skipped": 0, "errors": []}
-    if not dry_run and bank_transaction and settings.receipt_provider in {"Airwallex", "Compatibility API"}:
-        receipt = attach_airwallex_receipts(settings, client, expense, "Bank Transaction", bank_transaction)
-        state = "attached" if receipt["attached"] or receipt["skipped"] else "missing"
-        frappe.db.set_value("Bank Transaction", bank_transaction, "custom_airwallex_receipt_state", state, update_modified=False)
+    receipt = {"provider": settings.receipt_provider, "status": "not_processed", "attached": 0, "skipped": 0, "errors": []}
+    if not dry_run and bank_transaction and settings.receipt_provider not in {"Disabled", "Manual"}:
+        receipt = attach_provider_receipts(settings, client, expense, "Bank Transaction", bank_transaction)
+        frappe.db.set_value(
+            "Bank Transaction",
+            bank_transaction,
+            "custom_airwallex_receipt_state",
+            receipt.get("status") or "missing",
+            update_modified=False,
+        )
 
     if (
         not dry_run

@@ -4,20 +4,32 @@ Receipts are stored as private Frappe **File** records attached to the relevant 
 
 ## Providers
 
-- **Airwallex** — downloads receipt content exposed by the Airwallex expense API when available to the account.
-- **Compatibility API** — accepts receipt content from an existing trusted integration during migration. It requires a per-connection secret and deduplicates by expense ID, message ID, attachment ID, and content hash.
-- **IMAP** — optional generic mailbox provider. Credentials are stored in Password fields; matching is scored from message metadata and attachments.
+- **Airwallex** — downloads receipt content exposed by the Airwallex expense API.
+- **Airwallex + Frappe Email Account** — prefers native Airwallex attachments and falls back to a mailbox managed by Frappe when Airwallex has no attachment.
+- **Frappe Email Account** — searches received Frappe Communication records and their private File attachments. The selected Email Account owns Gmail OAuth or IMAP credentials.
+- **IMAP** — optional direct generic mailbox provider using credentials stored in Airwallex Settings.
 - **Manual** — preserves manual attachment workflows.
 - **Disabled** — no automated receipt discovery.
 
-## Compatibility status
+The former Compatibility API provider is migrated automatically to **Airwallex**. It is not required at runtime and no external orchestration script is needed.
 
-Native Airwallex receipt availability differs by product and account. The compatibility path should remain deployed until native Airwallex or IMAP parity has been tested against real receipts, including duplicates, multiple attachments, unsupported content types, and delayed delivery. Removing an external receipt workflow before that validation risks losing evidence.
+## Frappe Email Account setup
+
+1. Create an incoming **Email Account** in ERPNext and authorize Gmail OAuth or configure IMAP there.
+2. Confirm **Enable Incoming** is active and allow Frappe to synchronize the mailbox.
+3. Select that account in **Airwallex Settings → Receipt Email Account**.
+4. Choose **Airwallex + Frappe Email Account** for native attachments with mailbox fallback, or **Frappe Email Account** for mailbox-only discovery.
+
+Mailbox matching uses merchant, amount, currency, and transaction date. Multiple attachments from one high-confidence message are kept together. Competing messages with nearly equal confidence are recorded as held Receipt Matches instead of attaching uncertain evidence.
+
+## Scheduling and webhooks
+
+Receipt recovery runs inside Frappe together with the application’s native webhook queue, hourly incremental recovery, and daily full recovery. Windmill, cron wrappers, and external receipt-forwarding scripts are not part of the production architecture.
 
 ## Security
 
-Keep files private, restrict access through ERPNext roles, avoid logging attachment content, and rotate the compatibility secret after cutover. IMAP accounts should use a dedicated mailbox and least-privilege credentials.
+Keep files private and restrict access through ERPNext roles. For Gmail, prefer a standard Frappe Email Account with OAuth rather than copying credentials into the Airwallex integration. Attachment content is not logged. Source IDs, message IDs, and content hashes are stored only for traceability and duplicate prevention.
 
 ## Troubleshooting
 
-A receipt state of pending means the expense was imported before attachment processing completed. Missing means no provider candidate was attached. Attached includes a newly created private File; skipped generally indicates an already-known attachment. Review the Receipt Match and Sync Log records before retrying.
+A receipt state of `pending` means the expense was imported before attachment processing completed. `missing` means the selected provider found no candidate. `ambiguous` means multiple mailbox messages were too close to choose safely. `attached` includes a newly created private File or an already-known duplicate. Review **Receipt Matches** and **Sync Logs** before retrying.

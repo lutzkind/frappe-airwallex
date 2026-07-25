@@ -2,6 +2,20 @@
 
 All notable changes are documented here.
 
+## [1.0.6] - 2026-07-25
+
+### Added
+
+- Add a Frappe Email Account receipt provider that uses ERPNext-managed incoming email and private Communication attachments.
+- Add a combined Airwallex-first provider with Frappe mailbox fallback.
+- Record mailbox matches and ambiguous candidates in Airwallex Receipt Match.
+
+### Changed
+
+- Run all receipt discovery through providers owned by the Frappe application.
+- Migrate legacy Compatibility API settings to native Airwallex attachment retrieval.
+- Keep webhook processing, hourly recovery, daily recovery, and receipt collection inside Frappe without external orchestration scripts.
+
 ## [1.0.5] - 2026-07-24
 
 ### Fixed

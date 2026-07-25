@@ -18,7 +18,11 @@ class AirwallexReceiptProvider(ReceiptProvider):
                     source_id=str(attachment.get("id") or attachment["file_url"]),
                     file_name=attachment.get("file_name") or "airwallex-receipt",
                     content=content,
-                    metadata={"content_type": attachment.get("content_type")},
+                    metadata={
+                        "provider": "Airwallex",
+                        "attachment_id": str(attachment.get("id") or attachment["file_url"]),
+                        "content_type": attachment.get("content_type"),
+                    },
                 )
             )
         return results

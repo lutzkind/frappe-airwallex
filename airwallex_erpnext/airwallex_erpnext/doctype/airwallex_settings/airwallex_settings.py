@@ -1,6 +1,8 @@
 import frappe
 from frappe.model.document import Document
 
+FRAPPE_EMAIL_PROVIDERS = {"Frappe Email Account", "Airwallex + Frappe Email Account"}
+
 
 class AirwallexSettings(Document):
     def validate(self):
@@ -10,3 +12,26 @@ class AirwallexSettings(Document):
             frappe.throw("Card Expenses must be enabled before marking expenses synced")
         if self.webhook_tolerance_seconds and int(self.webhook_tolerance_seconds) < 30:
             frappe.throw("Webhook replay tolerance must be at least 30 seconds")
+        self._validate_receipt_provider()
+
+    def _validate_receipt_provider(self):
+        provider = str(self.receipt_provider or "Disabled")
+        if provider in FRAPPE_EMAIL_PROVIDERS:
+            if not self.receipt_email_account:
+                frappe.throw("Receipt Email Account is required for the selected receipt provider")
+            account = frappe.get_cached_doc("Email Account", self.receipt_email_account)
+            if not account.enable_incoming:
+                frappe.throw("The selected Receipt Email Account must have incoming email enabled")
+
+        if provider == "IMAP":
+            missing = [
+                label
+                for label, value in (
+                    ("IMAP Host", self.imap_host),
+                    ("IMAP Username", self.imap_username),
+                    ("IMAP Password", self.get_password("imap_password", raise_exception=False)),
+                )
+                if not value
+            ]
+            if missing:
+                frappe.throw(f"The IMAP receipt provider requires: {', '.join(missing)}")
