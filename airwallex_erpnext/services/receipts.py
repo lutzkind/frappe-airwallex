@@ -177,7 +177,7 @@ def _attach_candidate(*, candidate: ReceiptCandidate, doctype: str, docname: str
     if attachment_id and frappe.db.exists("File", {"custom_airwallex_attachment_id": attachment_id}):
         return "skipped"
 
-    digest = content_hash(candidate.content)
+    digest = frappe_content_hash(candidate.content)
     filters = {"content_hash": digest, "attached_to_doctype": doctype, "attached_to_name": docname}
     if frappe.db.exists("File", filters):
         return "skipped"
