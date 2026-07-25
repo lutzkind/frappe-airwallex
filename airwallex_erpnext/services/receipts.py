@@ -242,7 +242,8 @@ def attach_compatibility_content(
 ) -> dict[str, Any]:
     content = base64.b64decode(content_b64, validate=True)
     digest = content_hash(content)
-    filters = {"content_hash": digest, "attached_to_doctype": doctype, "attached_to_name": docname}
+    file_digest = frappe_content_hash(content)
+    filters = {"content_hash": file_digest, "attached_to_doctype": doctype, "attached_to_name": docname}
     existing = frappe.db.get_value("File", filters, "name")
     if existing:
         return {"status": "exists", "file": existing, "content_hash": digest}
