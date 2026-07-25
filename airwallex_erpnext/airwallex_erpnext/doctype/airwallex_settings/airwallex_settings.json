@@ -341,13 +341,23 @@
       "fieldname": "receipt_provider",
       "label": "Receipt Provider",
       "fieldtype": "Select",
-      "options": "Airwallex\nCompatibility API\nIMAP\nManual\nDisabled",
-      "default": "Compatibility API"
+      "options": "Airwallex\nAirwallex + Frappe Email Account\nFrappe Email Account\nIMAP\nManual\nDisabled",
+      "default": "Airwallex"
+    },
+    {
+      "fieldname": "receipt_email_account",
+      "label": "Receipt Email Account",
+      "fieldtype": "Link",
+      "options": "Email Account",
+      "depends_on": "eval:['Airwallex + Frappe Email Account','Frappe Email Account'].includes(doc.receipt_provider)",
+      "mandatory_depends_on": "eval:['Airwallex + Frappe Email Account','Frappe Email Account'].includes(doc.receipt_provider)",
+      "description": "Incoming mailbox managed by Frappe. Configure OAuth or IMAP in Email Account; credentials are not stored in this integration."
     },
     {
       "fieldname": "compatibility_secret",
-      "label": "Windmill Compatibility Secret",
-      "fieldtype": "Password"
+      "label": "Legacy Compatibility Secret",
+      "fieldtype": "Password",
+      "hidden": 1
     },
     {
       "fieldname": "imap_section",
