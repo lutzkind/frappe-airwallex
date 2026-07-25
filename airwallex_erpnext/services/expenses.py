@@ -6,7 +6,7 @@ import frappe
 
 from airwallex_erpnext.constants import EXPENSE_APPROVED_STATES
 from airwallex_erpnext.services.mappings import account_mapping, resolve
-from airwallex_erpnext.services.receipts import attach_airwallex_receipts
+from airwallex_erpnext.services.receipts import attach_provider_receipts
 from airwallex_erpnext.services.suppliers import resolve_supplier
 from airwallex_erpnext.utils import as_float, iso_to_date, payload_hash
 
