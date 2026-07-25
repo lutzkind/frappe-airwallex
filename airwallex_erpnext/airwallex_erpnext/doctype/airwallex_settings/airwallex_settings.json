@@ -54,6 +54,7 @@
     "webhook_version",
     "receipt_section",
     "receipt_provider",
+    "receipt_email_account",
     "compatibility_secret",
     "imap_section",
     "imap_host",
