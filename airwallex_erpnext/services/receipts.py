@@ -5,6 +5,7 @@ from collections import defaultdict
 from typing import Any
 
 import frappe
+from frappe.utils.file_manager import get_content_hash as frappe_content_hash
 from frappe.utils.file_manager import save_file
 
 from airwallex_erpnext.providers.receipts.airwallex import AirwallexReceiptProvider
