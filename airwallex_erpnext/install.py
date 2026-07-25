@@ -98,30 +98,94 @@ def create_fields():
 
 def create_workspace():
     name = "Airwallex Banking"
-    if frappe.db.exists("Workspace", name):
-        return
-    doc = frappe.get_doc(
-        {
-            "doctype": "Workspace",
-            "title": name,
-            "label": name,
-            "module": "Airwallex ERPNext",
-            "public": 1,
-            "is_hidden": 0,
-            "icon": "bank",
-            "content": "[]",
-            "links": [
-                {"type": "Link", "label": "Settings", "link_type": "DocType", "link_to": "Airwallex Settings"},
-                {"type": "Link", "label": "Account Mappings", "link_type": "DocType", "link_to": "Airwallex Account Mapping"},
-                {"type": "Link", "label": "Mapping Rules", "link_type": "DocType", "link_to": "Airwallex Mapping Rule"},
-                {"type": "Link", "label": "Webhook Events", "link_type": "DocType", "link_to": "Airwallex Webhook Event"},
-                {"type": "Link", "label": "Sync Logs", "link_type": "DocType", "link_to": "Airwallex Sync Log"},
-                {"type": "Link", "label": "Reconciliation Proposals", "link_type": "DocType", "link_to": "Airwallex Reconciliation Proposal"},
-                {"type": "Link", "label": "Receipt Matches", "link_type": "DocType", "link_to": "Airwallex Receipt Match"},
-                {"type": "Link", "label": "Bank Transactions", "link_type": "DocType", "link_to": "Bank Transaction"},
-            ],
-        }
+    content = frappe.as_json(
+        [
+            {
+                "id": "airwallex_header",
+                "type": "header",
+                "data": {"text": '<span class="h2">Airwallex Banking</span>', "col": 12},
+            },
+            {
+                "id": "airwallex_intro",
+                "type": "paragraph",
+                "data": {
+                    "text": "Manage the Airwallex connection, transaction imports, receipts, mapping, and reconciliation from ERPNext.",
+                    "col": 12,
+                },
+            },
+            {
+                "id": "airwallex_connection_card",
+                "type": "card",
+                "data": {"card_name": "Connection & Settings", "col": 4},
+            },
+            {
+                "id": "airwallex_operations_card",
+                "type": "card",
+                "data": {"card_name": "Transactions & Monitoring", "col": 4},
+            },
+            {
+                "id": "airwallex_reconciliation_card",
+                "type": "card",
+                "data": {"card_name": "Reconciliation & Receipts", "col": 4},
+            },
+        ]
     )
+    links = [
+        {
+            "type": "Card Break",
+            "label": "Connection & Settings",
+            "link_type": "DocType",
+            "link_count": 3,
+            "description": "Connect Airwallex and configure ERPNext account mapping.",
+        },
+        {"type": "Link", "label": "Settings", "link_type": "DocType", "link_to": "Airwallex Settings"},
+        {"type": "Link", "label": "Account Mappings", "link_type": "DocType", "link_to": "Airwallex Account Mapping"},
+        {"type": "Link", "label": "Mapping Rules", "link_type": "DocType", "link_to": "Airwallex Mapping Rule"},
+        {
+            "type": "Card Break",
+            "label": "Transactions & Monitoring",
+            "link_type": "DocType",
+            "link_count": 3,
+            "description": "Review imported banking activity and integration processing.",
+        },
+        {"type": "Link", "label": "Bank Transactions", "link_type": "DocType", "link_to": "Bank Transaction"},
+        {"type": "Link", "label": "Sync Logs", "link_type": "DocType", "link_to": "Airwallex Sync Log"},
+        {"type": "Link", "label": "Webhook Events", "link_type": "DocType", "link_to": "Airwallex Webhook Event"},
+        {
+            "type": "Card Break",
+            "label": "Reconciliation & Receipts",
+            "link_type": "DocType",
+            "link_count": 2,
+            "description": "Review receipt matches and proposed accounting reconciliation.",
+        },
+        {
+            "type": "Link",
+            "label": "Reconciliation Proposals",
+            "link_type": "DocType",
+            "link_to": "Airwallex Reconciliation Proposal",
+        },
+        {"type": "Link", "label": "Receipt Matches", "link_type": "DocType", "link_to": "Airwallex Receipt Match"},
+    ]
+    values = {
+        "title": name,
+        "label": name,
+        "module": "Airwallex ERPNext",
+        "app": "airwallex_erpnext",
+        "public": 1,
+        "is_hidden": 0,
+        "icon": "bank",
+        "content": content,
+    }
+    if frappe.db.exists("Workspace", name):
+        doc = frappe.get_doc("Workspace", name)
+        doc.update(values)
+        doc.set("links", [])
+        for link in links:
+            doc.append("links", link)
+        doc.save(ignore_permissions=True)
+        return
+
+    doc = frappe.get_doc({"doctype": "Workspace", **values, "links": links})
     doc.insert(ignore_permissions=True)
 
 

@@ -18,7 +18,25 @@ def test_release_versions_match():
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__version__":
                     version = ast.literal_eval(node.value)
-    assert project["project"]["version"] == version == "1.0.7"
+    assert project["project"]["version"] == version == "1.0.8"
+
+
+def test_workspace_has_renderable_layout():
+    install_source = (ROOT / "airwallex_erpnext" / "install.py").read_text(encoding="utf-8")
+    assert '"type": "card"' in install_source
+    assert '"type": "Card Break"' in install_source
+    assert '"content": "[]"' not in install_source
+    for label in (
+        "Settings",
+        "Account Mappings",
+        "Mapping Rules",
+        "Bank Transactions",
+        "Sync Logs",
+        "Webhook Events",
+        "Reconciliation Proposals",
+        "Receipt Matches",
+    ):
+        assert label in install_source
 
 
 def test_doctype_json_and_safe_defaults():

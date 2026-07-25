@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "airwallex-erpnext"
-version = "1.0.7"
+version = "1.0.8"
 description = "Community Airwallex banking and spend integration for Frappe and ERPNext"
 readme = "README.md"
 requires-python = ">=3.12"
