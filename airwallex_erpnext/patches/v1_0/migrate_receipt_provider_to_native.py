@@ -14,7 +14,7 @@ def execute():
         "Airwallex Settings",
         filters={"receipt_provider": "Compatibility API"},
         pluck="name",
-        limit_page_length=0,
+        limit_page_length=1000,
     )
     for name in names:
         frappe.db.set_value(
