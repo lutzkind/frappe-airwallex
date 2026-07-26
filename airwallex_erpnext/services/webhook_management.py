@@ -22,7 +22,7 @@ def inspect_subscription(settings_name: str, *, persist: bool = True) -> dict:
     version = str(settings.webhook_version or MINIMUM_SPEND_WEBHOOK_VERSION)
     events = desired_events(settings)
     subscriptions = _list_subscriptions(client)
-    exact = [item for item in subscriptions if _normalize_url(item.get("url")) == _normalize_url(target_url)]
+    exact = [item for item in subscriptions if normalize_url(item.get("url")) == normalize_url(target_url)]
     preferred = _choose_subscription(settings, exact)
     existing_secret = settings.get_password("webhook_secret", raise_exception=False)
     effective_secret = str((preferred or {}).get("secret") or existing_secret or "")
