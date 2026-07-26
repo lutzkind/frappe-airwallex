@@ -131,7 +131,7 @@ def remove_subscription(settings_name: str) -> dict:
     ids = {
         str(item["id"])
         for item in subscriptions
-        if item.get("id") and _normalize_url(item.get("url")) == _normalize_url(target_url)
+        if item.get("id") and normalize_url(item.get("url")) == normalize_url(target_url)
     }
     if settings.webhook_subscription_id:
         ids.add(str(settings.webhook_subscription_id))
