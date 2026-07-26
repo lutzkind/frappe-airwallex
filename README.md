@@ -20,7 +20,7 @@ Bank Transactions are the safe default. Accounting-document creation, document s
 ## Installation
 
 ```bash
-bench get-app https://github.com/lutzkind/frappe-airwallex.git --branch v1.0.7
+bench get-app https://github.com/lutzkind/frappe-airwallex.git --branch v1.0.9
 bench --site your-site.example install-app airwallex_erpnext
 bench --site your-site.example migrate
 ```
@@ -46,6 +46,9 @@ A dry run still contacts Airwallex and evaluates mappings, but it does not creat
 
 ```text
 /api/method/airwallex_erpnext.api.webhook
+/api/method/airwallex_erpnext.api.webhook_status
+/api/method/airwallex_erpnext.api.ensure_webhook_subscription
+/api/method/airwallex_erpnext.api.remove_webhook_subscription
 /api/method/airwallex_erpnext.api.sync_now
 /api/method/airwallex_erpnext.api.sync_job_status
 /api/method/airwallex_erpnext.api.discover_capabilities

@@ -48,10 +48,15 @@
     "mark_expenses_synced",
     "mark_bills_synced",
     "webhook_section",
-    "webhook_secret",
+    "webhook_version",
     "webhook_tolerance_seconds",
     "webhook_max_attempts",
-    "webhook_version",
+    "webhook_subscription_id",
+    "webhook_subscription_status",
+    "webhook_subscription_url",
+    "webhook_subscribed_events",
+    "last_webhook_check",
+    "webhook_secret",
     "receipt_section",
     "receipt_provider",
     "receipt_email_account",
@@ -310,9 +315,11 @@
       "fieldtype": "Section Break"
     },
     {
-      "fieldname": "webhook_secret",
-      "label": "Webhook Secret",
-      "fieldtype": "Password"
+      "fieldname": "webhook_version",
+      "label": "Webhook API Version",
+      "fieldtype": "Data",
+      "default": "2025-11-11",
+      "description": "Spend webhook subscriptions require version 2025-11-11 or newer."
     },
     {
       "fieldname": "webhook_tolerance_seconds",
@@ -327,10 +334,41 @@
       "default": "5"
     },
     {
-      "fieldname": "webhook_version",
-      "label": "Webhook API Version",
+      "fieldname": "webhook_subscription_id",
+      "label": "Subscription ID",
       "fieldtype": "Data",
-      "default": "2025-11-11"
+      "read_only": 1
+    },
+    {
+      "fieldname": "webhook_subscription_status",
+      "label": "Subscription Status",
+      "fieldtype": "Data",
+      "read_only": 1
+    },
+    {
+      "fieldname": "webhook_subscription_url",
+      "label": "Subscription URL",
+      "fieldtype": "Data",
+      "read_only": 1
+    },
+    {
+      "fieldname": "webhook_subscribed_events",
+      "label": "Subscribed Events",
+      "fieldtype": "Small Text",
+      "read_only": 1
+    },
+    {
+      "fieldname": "last_webhook_check",
+      "label": "Last Webhook Check",
+      "fieldtype": "Datetime",
+      "read_only": 1
+    },
+    {
+      "fieldname": "webhook_secret",
+      "label": "Webhook Secret",
+      "fieldtype": "Password",
+      "read_only": 1,
+      "description": "Managed automatically when ERPNext creates or adopts the Airwallex webhook subscription."
     },
     {
       "fieldname": "receipt_section",
