@@ -123,6 +123,55 @@ def ensure_subscription(settings_name: str) -> dict:
     }
 
 
+def reconcile_enabled_subscriptions(*, source: str = "scheduler") -> list[dict]:
+    """Ensure enabled Airwallex connections own one exact ERPNext webhook.
+
+    Reconciliation is intentionally best-effort so a temporary Airwallex API
+    outage cannot block a Frappe migration or stop scheduled transaction
+    recovery. Each connection persists a bounded status and is retried later.
+    """
+    settings_names = frappe.get_all(
+        "Airwallex Settings",
+        filters={"enabled": 1},
+        pluck="name",
+        limit_page_length=0,
+    )
+    results: list[dict] = []
+    for settings_name in settings_names:
+        settings = frappe.get_doc("Airwallex Settings", settings_name)
+        if not desired_events(settings):
+            results.append({"settings": settings_name, "status": "Skipped", "reason": "no_webhook_modules_enabled"})
+            continue
+        try:
+            result = ensure_subscription(settings_name)
+            results.append(
+                {
+                    "settings": settings_name,
+                    "status": result.get("status"),
+                    "action": result.get("action"),
+                    "target_url": result.get("target_url"),
+                    "has_signing_secret": bool(result.get("has_signing_secret")),
+                }
+            )
+        except Exception as exc:
+            settings = frappe.get_doc("Airwallex Settings", settings_name)
+            settings.webhook_subscription_status = "Error"
+            settings.last_webhook_check = frappe.utils.now_datetime()
+            settings.save(ignore_permissions=True)
+            results.append(
+                {
+                    "settings": settings_name,
+                    "status": "Error",
+                    "error_type": type(exc).__name__,
+                    "error": str(exc)[:500],
+                }
+            )
+
+    summary = {"source": source, "connections": results}
+    print(f"[airwallex-webhook-reconcile] {frappe.as_json(summary)}")
+    return results
+
+
 def remove_subscription(settings_name: str) -> dict:
     settings = frappe.get_doc("Airwallex Settings", settings_name)
     client = get_client(settings)

@@ -17,6 +17,9 @@ scheduler_events = {
         "17 * * * *": [
             "airwallex_erpnext.tasks.hourly_recovery",
         ],
+        "47 * * * *": [
+            "airwallex_erpnext.services.webhook_management.reconcile_enabled_subscriptions",
+        ],
         "35 3 * * *": [
             "airwallex_erpnext.tasks.daily_recovery",
         ],
