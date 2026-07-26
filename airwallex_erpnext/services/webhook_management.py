@@ -187,18 +187,6 @@ def _choose_subscription(settings, items: list[dict]) -> dict | None:
     return sorted(items, key=lambda item: str(item.get("updated_at") or item.get("created_at") or ""), reverse=True)[0]
 
 
-def _subscription_matches(subscription: dict, *, target_url: str, version: str, events: list[str]) -> bool:
-    return (
-        _normalize_url(subscription.get("url")) == _normalize_url(target_url)
-        and str(subscription.get("version") or "") == str(version)
-        and sorted(set(subscription.get("events") or [])) == sorted(set(events))
-    )
-
-
-def _normalize_url(value) -> str:
-    return str(value or "").strip().rstrip("/")
-
-
 def _public_subscription(subscription: dict | None) -> dict | None:
     if not subscription:
         return None
