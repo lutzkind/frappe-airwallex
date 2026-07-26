@@ -109,7 +109,7 @@ def ensure_subscription(settings_name: str) -> dict:
     verified = client.request("GET", f"/api/v1/webhooks/{keep['id']}")
     if keep.get("secret") and not verified.get("secret"):
         verified["secret"] = keep["secret"]
-    if not _subscription_matches(verified, target_url=target_url, version=version, events=events):
+    if not subscription_matches(verified, target_url=target_url, version=version, events=events):
         frappe.throw("Airwallex webhook verification did not match the requested configuration")
 
     _save_metadata(settings, verified, status="Configured", secret=verified.get("secret"))
