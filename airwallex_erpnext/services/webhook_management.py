@@ -189,8 +189,9 @@ def _list_subscriptions(client) -> list[dict]:
 
 def _delete_subscription(client, subscription_id: str) -> None:
     result = client.request("POST", f"/api/v1/webhooks/{subscription_id}/delete")
-    if result and result.get("deleted") is False:
-        frappe.throw(f"Airwallex did not delete webhook {subscription_id}")
+    returned_id = str((result or {}).get("id") or "")
+    if returned_id and returned_id != subscription_id:
+        frappe.throw(f"Airwallex returned an unexpected webhook ID while deleting {subscription_id}")
 
 
 def _choose_subscription(settings, items: list[dict]) -> dict | None:
