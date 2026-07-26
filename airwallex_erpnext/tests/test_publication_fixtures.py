@@ -18,7 +18,18 @@ def test_release_versions_match():
             for target in node.targets:
                 if isinstance(target, ast.Name) and target.id == "__version__":
                     version = ast.literal_eval(node.value)
-    assert project["project"]["version"] == version == "1.0.10"
+    assert project["project"]["version"] == version == "1.0.11"
+
+
+def test_post_migrate_webhook_verification_is_queued():
+    install_source = (ROOT / "airwallex_erpnext" / "install.py").read_text(encoding="utf-8")
+    management_source = (
+        ROOT / "airwallex_erpnext" / "services" / "webhook_management.py"
+    ).read_text(encoding="utf-8")
+    assert "airwallex-webhook-post-migrate-verification" in install_source
+    assert "enqueue_after_commit=True" in install_source
+    assert "def verify_enabled_subscriptions" in management_source
+    assert 'not in {"Configured", "Skipped"}' in management_source
 
 
 def test_workspace_has_renderable_layout():
