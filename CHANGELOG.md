@@ -2,6 +2,13 @@
 
 All notable changes are documented here.
 
+## [1.0.11] - 2026-07-26
+
+### Added
+
+- Queue a strict post-migration webhook verification job after the database transaction commits.
+- Make an unhealthy enabled subscription fail visibly in the normal Frappe worker logs while keeping hourly recovery best-effort.
+
 ## [1.0.10] - 2026-07-26
 
 ### Added
