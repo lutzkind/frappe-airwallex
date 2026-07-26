@@ -2,6 +2,14 @@
 
 All notable changes are documented here.
 
+## [1.0.10] - 2026-07-26
+
+### Added
+
+- Automatically reconcile enabled Airwallex webhook subscriptions after site migration and every hour.
+- Retry temporary Airwallex API failures without blocking ERPNext startup or scheduled transaction recovery.
+- Persist a bounded connection status and emit a sanitized reconciliation summary for operations.
+
 ## [1.0.9] - 2026-07-26
 
 ### Added
