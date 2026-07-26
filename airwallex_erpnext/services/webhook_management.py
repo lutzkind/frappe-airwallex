@@ -62,11 +62,11 @@ def ensure_subscription(settings_name: str) -> dict:
         frappe.throw("Enable Card Expenses or Reimbursements before creating a Spend webhook")
 
     subscriptions = _list_subscriptions(client)
-    exact = [item for item in subscriptions if _normalize_url(item.get("url")) == _normalize_url(target_url)]
+    exact = [item for item in subscriptions if normalize_url(item.get("url")) == normalize_url(target_url)]
     matching = [
         item
         for item in exact
-        if _subscription_matches(item, target_url=target_url, version=version, events=events)
+        if subscription_matches(item, target_url=target_url, version=version, events=events)
     ]
     existing_secret = settings.get_password("webhook_secret", raise_exception=False)
     usable = [item for item in matching if item.get("secret") or existing_secret]
