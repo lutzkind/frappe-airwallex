@@ -195,6 +195,11 @@ def _list_subscriptions(client) -> list[dict]:
     )
 
 
+def _subscriptions_for_url(client, target_url: str) -> list[dict]:
+    normalized = _normalize_url(target_url)
+    return [item for item in _list_subscriptions(client) if _normalize_url(item.get("url")) == normalized]
+
+
 def _delete_subscription(client, subscription_id: str) -> None:
     result = client.request("POST", f"/api/v1/webhooks/{subscription_id}/delete")
     returned_id = str((result or {}).get("id") or "")
