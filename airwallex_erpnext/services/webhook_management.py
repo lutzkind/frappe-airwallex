@@ -172,6 +172,27 @@ def reconcile_enabled_subscriptions(*, source: str = "scheduler") -> list[dict]:
     return results
 
 
+def verify_enabled_subscriptions(*, source: str = "verification") -> list[dict]:
+    """Reconcile enabled connections and fail the job if any remain unhealthy.
+
+    This is intended for post-migration and operator-visible verification. The
+    regular hourly reconciliation remains best-effort so transient provider
+    outages never disable ERP transaction recovery.
+    """
+    results = reconcile_enabled_subscriptions(source=source)
+    failures = [item for item in results if item.get("status") not in {"Configured", "Skipped"}]
+    if failures:
+        frappe.throw(
+            f"Airwallex webhook verification failed for {len(failures)} enabled connection(s): "
+            + frappe.as_json(failures)
+        )
+    print(
+        f"[airwallex-webhook-verify] "
+        f"{frappe.as_json({'source': source, 'configured_connections': len(results)})}"
+    )
+    return results
+
+
 def remove_subscription(settings_name: str) -> dict:
     settings = frappe.get_doc("Airwallex Settings", settings_name)
     client = get_client(settings)
