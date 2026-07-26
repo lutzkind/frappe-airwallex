@@ -24,6 +24,30 @@ def sync_now(settings: str, module: str = "all", dry_run: int = 0):
     return run_sync(settings, module=module, dry_run=bool(int(dry_run)))
 
 
+@frappe.whitelist()
+def webhook_status(settings: str):
+    frappe.only_for(("System Manager", "Airwallex Administrator"))
+    from airwallex_erpnext.services.webhook_management import inspect_subscription
+
+    return inspect_subscription(settings)
+
+
+@frappe.whitelist()
+def ensure_webhook_subscription(settings: str):
+    frappe.only_for(("System Manager", "Airwallex Administrator"))
+    from airwallex_erpnext.services.webhook_management import ensure_subscription
+
+    return ensure_subscription(settings)
+
+
+@frappe.whitelist()
+def remove_webhook_subscription(settings: str):
+    frappe.only_for(("System Manager", "Airwallex Administrator"))
+    from airwallex_erpnext.services.webhook_management import remove_subscription
+
+    return remove_subscription(settings)
+
+
 @frappe.whitelist(allow_guest=True)
 def webhook():
     request = frappe.request
@@ -62,17 +86,18 @@ def ingest_compatibility_receipt():
     supplied = frappe.request.headers.get("x-airwallex-compatibility-secret", "")
     expected = settings.get_password("compatibility_secret", raise_exception=False)
     import hmac
+
     if not expected or not hmac.compare_digest(str(supplied), str(expected)):
         frappe.local.response.http_status_code = 401
         return {"ok": False, "error": "unauthorized"}
     return ingest_receipt(settings, payload)
 
 
-
 @frappe.whitelist()
 def migration_report(settings: str, apply: int = 0):
     frappe.only_for(("System Manager", "Airwallex Administrator"))
     from airwallex_erpnext.services.migration import adopt_legacy_records
+
     return adopt_legacy_records(settings, dry_run=not bool(int(apply)))
 
 
@@ -80,6 +105,7 @@ def migration_report(settings: str, apply: int = 0):
 def export_accounting_catalog(settings: str):
     frappe.only_for(("System Manager", "Airwallex Administrator", "Airwallex Accountant"))
     from airwallex_erpnext.services.catalog import export_csv
+
     return export_csv(settings)
 
 
@@ -87,7 +113,9 @@ def export_accounting_catalog(settings: str):
 def propose_reconciliation(bank_transaction: str):
     frappe.only_for(("System Manager", "Airwallex Administrator", "Airwallex Accountant", "Airwallex Reviewer"))
     from airwallex_erpnext.services.reconciliation import propose_for_bank_transaction
+
     return [candidate.__dict__ for candidate in propose_for_bank_transaction(bank_transaction)]
+
 
 def _verify_against_enabled_connections(raw: bytes, timestamp: str, signature: str):
     settings_names = frappe.get_all(
