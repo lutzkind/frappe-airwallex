@@ -5,40 +5,10 @@ from uuid import uuid4
 import frappe
 
 from airwallex_erpnext.frappe_support import get_client
+from airwallex_erpnext.webhook_catalog import desired_events, normalize_url, subscription_matches
 
 WEBHOOK_METHOD_PATH = "/api/method/airwallex_erpnext.api.webhook"
 MINIMUM_SPEND_WEBHOOK_VERSION = "2025-11-11"
-
-EXPENSE_EVENTS = (
-    "spend.expense.draft",
-    "spend.expense.awaiting_approval",
-    "spend.expense.updated",
-    "spend.expense.rejected",
-    "spend.expense.approved",
-    "spend.expense.archived",
-    "spend.expense.deleted",
-)
-
-REIMBURSEMENT_EVENTS = (
-    "spend.reimbursement_report.draft",
-    "spend.reimbursement_report.awaiting_approval",
-    "spend.reimbursement_report.awaiting_payment",
-    "spend.reimbursement_report.rejected",
-    "spend.reimbursement_report.payment_in_progress",
-    "spend.reimbursement_report.paid",
-    "spend.reimbursement_report.mark_as_paid",
-    "spend.reimbursement_report.deleted",
-    "spend.reimbursement_report.updated",
-)
-
-
-def desired_events(settings) -> list[str]:
-    events: list[str] = []
-    if int(settings.enable_expenses or 0):
-        events.extend(EXPENSE_EVENTS)
-    if int(settings.enable_reimbursements or 0):
-        events.extend(REIMBURSEMENT_EVENTS)
-    return sorted(set(events))
 
 
 def webhook_url() -> str:
