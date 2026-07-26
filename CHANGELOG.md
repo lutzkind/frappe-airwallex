@@ -2,6 +2,25 @@
 
 All notable changes are documented here.
 
+## [1.0.9] - 2026-07-26
+
+### Added
+
+- Manage the Airwallex webhook subscription directly from Airwallex Settings.
+- Check, create, adopt, repair, deduplicate, verify, and remove the ERPNext webhook without external scripts.
+- Store the Airwallex signing secret and subscription state in Frappe Password and read-only metadata fields.
+
+### Security
+
+- Restrict webhook management actions to System Manager and Airwallex Administrator roles.
+- Verify the exact callback URL, API version, event set, signing secret, and post-deletion state through the Airwallex API.
+
+## [1.0.8] - 2026-07-25
+
+### Fixed
+
+- Populate the Airwallex Banking workspace with renderable Frappe v16 cards and shortcuts.
+
 ## [1.0.7] - 2026-07-25
 
 ### Fixed
