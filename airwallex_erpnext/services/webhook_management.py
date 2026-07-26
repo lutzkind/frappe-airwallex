@@ -28,7 +28,7 @@ def inspect_subscription(settings_name: str, *, persist: bool = True) -> dict:
     effective_secret = str((preferred or {}).get("secret") or existing_secret or "")
     configured = bool(
         preferred
-        and _subscription_matches(preferred, target_url=target_url, version=version, events=events)
+        and subscription_matches(preferred, target_url=target_url, version=version, events=events)
         and effective_secret
         and len(exact) == 1
     )
