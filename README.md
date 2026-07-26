@@ -46,6 +46,9 @@ A dry run still contacts Airwallex and evaluates mappings, but it does not creat
 
 ```text
 /api/method/airwallex_erpnext.api.webhook
+/api/method/airwallex_erpnext.api.webhook_status
+/api/method/airwallex_erpnext.api.ensure_webhook_subscription
+/api/method/airwallex_erpnext.api.remove_webhook_subscription
 /api/method/airwallex_erpnext.api.sync_now
 /api/method/airwallex_erpnext.api.sync_job_status
 /api/method/airwallex_erpnext.api.discover_capabilities
