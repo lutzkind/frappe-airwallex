@@ -80,6 +80,13 @@ def after_migrate():
     from airwallex_erpnext.services.webhook_management import reconcile_enabled_subscriptions
 
     reconcile_enabled_subscriptions(source="after_migrate")
+    frappe.enqueue(
+        "airwallex_erpnext.services.webhook_management.verify_enabled_subscriptions",
+        queue="default",
+        job_name="airwallex-webhook-post-migrate-verification",
+        enqueue_after_commit=True,
+        source="after_migrate_verification",
+    )
 
 
 def create_roles():
