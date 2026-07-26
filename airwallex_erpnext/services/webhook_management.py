@@ -108,12 +108,17 @@ def ensure_subscription(settings_name: str) -> dict:
             if item.get("id") and item.get("id") != keep.get("id"):
                 _delete_subscription(client, str(item["id"]))
                 deleted_ids.append(str(item["id"]))
+        remaining_exact = _subscriptions_for_url(client, target_url)
+        if len(remaining_exact) != 1 or str(remaining_exact[0].get("id") or "") != str(keep.get("id") or ""):
+            frappe.throw("Airwallex webhook duplicate cleanup could not be verified")
         action = "adopted" if not settings.webhook_subscription_id else "verified"
     else:
         for item in exact:
             if item.get("id"):
                 _delete_subscription(client, str(item["id"]))
                 deleted_ids.append(str(item["id"]))
+        if _subscriptions_for_url(client, target_url):
+            frappe.throw("Airwallex webhook replacement could not remove the outdated subscription")
         keep = client.request(
             "POST",
             "/api/v1/webhooks/create",
