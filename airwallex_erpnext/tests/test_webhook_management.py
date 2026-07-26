@@ -1,10 +1,10 @@
 from types import SimpleNamespace
 
-from airwallex_erpnext.services.webhook_management import (
+from airwallex_erpnext.webhook_catalog import (
     EXPENSE_EVENTS,
     REIMBURSEMENT_EVENTS,
-    _subscription_matches,
     desired_events,
+    subscription_matches,
 )
 
 
@@ -31,19 +31,19 @@ def test_subscription_match_requires_exact_url_version_and_events():
         "version": "2025-11-11",
         "events": list(reversed(expected_events)),
     }
-    assert _subscription_matches(
+    assert subscription_matches(
         subscription,
         target_url=expected_url,
         version="2025-11-11",
         events=expected_events,
     )
-    assert not _subscription_matches(
+    assert not subscription_matches(
         {**subscription, "version": "2025-04-25"},
         target_url=expected_url,
         version="2025-11-11",
         events=expected_events,
     )
-    assert not _subscription_matches(
+    assert not subscription_matches(
         {**subscription, "events": expected_events[:-1]},
         target_url=expected_url,
         version="2025-11-11",
