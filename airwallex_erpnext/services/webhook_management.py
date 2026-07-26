@@ -171,6 +171,9 @@ def remove_subscription(settings_name: str) -> dict:
         _delete_subscription(client, subscription_id)
         deleted.append(subscription_id)
 
+    if _subscriptions_for_url(client, target_url):
+        frappe.throw("Airwallex webhook removal could not be verified")
+
     settings.webhook_subscription_id = ""
     settings.webhook_subscription_url = ""
     settings.webhook_subscription_status = "Removed"
