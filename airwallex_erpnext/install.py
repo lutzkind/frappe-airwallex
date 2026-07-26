@@ -77,6 +77,10 @@ def after_migrate():
     create_fields()
     create_workspace()
 
+    from airwallex_erpnext.services.webhook_management import reconcile_enabled_subscriptions
+
+    reconcile_enabled_subscriptions(source="after_migrate")
+
 
 def create_roles():
     for role in ROLES:
