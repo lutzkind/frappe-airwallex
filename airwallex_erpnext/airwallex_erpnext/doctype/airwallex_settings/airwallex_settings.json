@@ -51,6 +51,7 @@
     "webhook_version",
     "webhook_tolerance_seconds",
     "webhook_max_attempts",
+    "webhook_processing_timeout_minutes",
     "webhook_subscription_id",
     "webhook_subscription_status",
     "webhook_subscription_url",
@@ -332,6 +333,13 @@
       "label": "Max Processing Attempts",
       "fieldtype": "Int",
       "default": "5"
+    },
+    {
+      "fieldname": "webhook_processing_timeout_minutes",
+      "label": "Processing Timeout Minutes",
+      "fieldtype": "Int",
+      "default": "15",
+      "description": "Events left in Processing longer than this are requeued by the scheduler, or dead-lettered when the attempt budget is exhausted."
     },
     {
       "fieldname": "webhook_subscription_id",

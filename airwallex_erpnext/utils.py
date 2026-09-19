@@ -5,9 +5,11 @@ import json
 import re
 from collections.abc import Iterable
 from datetime import UTC, datetime
-from decimal import Decimal, InvalidOperation
+from decimal import ROUND_HALF_UP, Decimal, InvalidOperation
 from typing import Any
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
+
+MONEY_PRECISION = 2
 
 
 def canonical_json(value: Any) -> str:
@@ -29,7 +31,25 @@ def as_decimal(value: Any, default: str = "0") -> Decimal:
         return Decimal(default)
 
 
+def as_money(value: Any, precision: int = MONEY_PRECISION) -> Decimal:
+    """Coerce a value to authoritative decimal money.
+
+    Accounting amounts must be calculated as ``Decimal`` and converted to
+    binary float only at the Frappe document boundary via :func:`as_float`.
+    Rounding is half-up at the given currency precision.
+    """
+    quantum = Decimal(1).scaleb(-int(precision))
+    amount = as_decimal(value)
+    if not amount.is_finite():
+        amount = Decimal(0)
+    return amount.quantize(quantum, rounding=ROUND_HALF_UP)
+
+
 def as_float(value: Any) -> float:
+    """Boundary conversion for Frappe document fields.
+
+    Do not use the result for further money arithmetic; use :func:`as_money`.
+    """
     return float(as_decimal(value))
 
 
