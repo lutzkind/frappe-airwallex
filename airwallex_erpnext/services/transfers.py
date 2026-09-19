@@ -5,7 +5,7 @@ from typing import Any
 import frappe
 
 from airwallex_erpnext.services.mappings import account_mapping
-from airwallex_erpnext.utils import as_float, iso_to_date
+from airwallex_erpnext.utils import as_float, as_money, iso_to_date
 
 
 def import_transfer(settings, transfer: dict[str, Any], *, dry_run: bool = False):
@@ -22,7 +22,7 @@ def import_transfer(settings, transfer: dict[str, Any], *, dry_run: bool = False
     mapping = account_mapping(settings.name, source_currency)
     if not mapping:
         return {"status": "held", "reason": f"missing_account_mapping:{source_currency}", "id": transfer_id}
-    amount = as_float(transfer.get("amount_payer_pays") or transfer.get("source_amount") or transfer.get("transfer_amount"))
+    amount = as_money(transfer.get("amount_payer_pays") or transfer.get("source_amount") or transfer.get("transfer_amount"))
     beneficiary = transfer.get("beneficiary") or {}
     supplier = frappe.db.get_value("Supplier", {"supplier_name": beneficiary.get("name") or transfer.get("beneficiary_name")}, "name")
     if not supplier:
@@ -35,8 +35,8 @@ def import_transfer(settings, transfer: dict[str, Any], *, dry_run: bool = False
         "party_type": "Supplier",
         "party": supplier,
         "paid_from": mapping.ledger_account,
-        "paid_amount": amount,
-        "received_amount": amount,
+        "paid_amount": as_float(amount),
+        "received_amount": as_float(amount),
         "source_exchange_rate": 1,
         "target_exchange_rate": 1,
         "reference_no": transfer_id,

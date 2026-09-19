@@ -9,7 +9,7 @@ from airwallex_erpnext.services.mappings import resolve
 from airwallex_erpnext.services.payments import import_bill_payments
 from airwallex_erpnext.services.receipts import attach_airwallex_receipts
 from airwallex_erpnext.services.suppliers import resolve_supplier
-from airwallex_erpnext.utils import as_float, iso_to_date, payload_hash
+from airwallex_erpnext.utils import as_float, as_money, iso_to_date, payload_hash
 
 
 def import_bill(settings, client, bill: dict[str, Any], *, dry_run: bool = False):
@@ -39,7 +39,7 @@ def import_bill(settings, client, bill: dict[str, Any], *, dry_run: bool = False
                 "item_name": line.get("description") or vendor.get("name") or "Airwallex bill",
                 "description": line.get("description") or "Airwallex bill line",
                 "qty": as_float(line.get("quantity") or 1),
-                "rate": as_float(line.get("unit_price") or line.get("amount") or 0),
+                "rate": as_float(as_money(line.get("unit_price") or line.get("amount") or 0)),
                 "expense_account": account,
                 "cost_center": mapped.cost_center,
                 "project": mapped.project,
@@ -50,7 +50,7 @@ def import_bill(settings, client, bill: dict[str, Any], *, dry_run: bool = False
             "item_name": vendor.get("name") or "Airwallex bill",
             "description": bill.get("description") or "Airwallex bill",
             "qty": 1,
-            "rate": as_float(bill.get("amount") or bill.get("total_amount") or 0),
+            "rate": as_float(as_money(bill.get("amount") or bill.get("total_amount") or 0)),
             "expense_account": mapped.expense_account,
             "cost_center": mapped.cost_center,
             "project": mapped.project,

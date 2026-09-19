@@ -7,7 +7,7 @@ import frappe
 from airwallex_erpnext.constants import REIMBURSEMENT_READY_STATES
 from airwallex_erpnext.services.mappings import resolve
 from airwallex_erpnext.services.receipts import attach_airwallex_receipts
-from airwallex_erpnext.utils import as_float, iso_to_date, payload_hash
+from airwallex_erpnext.utils import as_float, as_money, iso_to_date, payload_hash
 
 
 def import_reimbursement(settings, client, report: dict[str, Any], *, dry_run: bool = False):
@@ -33,13 +33,14 @@ def import_reimbursement(settings, client, report: dict[str, Any], *, dry_run: b
     mapped = resolve(settings, "Reimbursement", report)
     expenses = []
     for item in report.get("reimbursements") or report.get("line_items") or []:
+        line_amount = as_money(item.get("amount") or item.get("transaction_amount"))
         expenses.append(
             {
                 "expense_date": iso_to_date(item.get("expense_date") or item.get("created_at")),
                 "expense_type": settings.default_expense_claim_type,
                 "description": item.get("description") or item.get("merchant") or "Airwallex reimbursement",
-                "amount": as_float(item.get("amount") or item.get("transaction_amount")),
-                "sanctioned_amount": as_float(item.get("amount") or item.get("transaction_amount")),
+                "amount": as_float(line_amount),
+                "sanctioned_amount": as_float(line_amount),
                 "cost_center": mapped.cost_center,
                 "project": mapped.project,
             }

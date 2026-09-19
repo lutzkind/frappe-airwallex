@@ -5,7 +5,7 @@ from typing import Any
 import frappe
 
 from airwallex_erpnext.services.mappings import account_mapping
-from airwallex_erpnext.utils import as_float, iso_to_date
+from airwallex_erpnext.utils import as_float, as_money, iso_to_date
 
 
 def import_bill_payment(
@@ -49,10 +49,11 @@ def import_bill_payment(
     if not mapping:
         return {"status": "held", "reason": f"missing_account_mapping:{currency}", "id": payment_id}
 
-    amount = as_float(payment.get("amount") or transfer.get("source_amount") or payment.get("source_amount"))
+    amount = as_money(payment.get("amount") or transfer.get("source_amount") or payment.get("source_amount"))
     if amount <= 0:
         return {"status": "held", "reason": "invalid_payment_amount", "id": payment_id}
-    allocated = min(amount, as_float(invoice.outstanding_amount or amount))
+    outstanding = as_money(invoice.outstanding_amount or amount)
+    allocated = min(amount, outstanding)
     posting_date = iso_to_date(transfer.get("transfer_date") or payment.get("created_at") or payment.get("paid_at"))
     values = {
         "doctype": "Payment Entry",
@@ -62,8 +63,8 @@ def import_bill_payment(
         "party_type": "Supplier",
         "party": invoice.supplier,
         "paid_from": mapping.ledger_account,
-        "paid_amount": amount,
-        "received_amount": amount,
+        "paid_amount": as_float(amount),
+        "received_amount": as_float(amount),
         "source_exchange_rate": 1,
         "target_exchange_rate": 1,
         "reference_no": payment_id,
@@ -73,7 +74,7 @@ def import_bill_payment(
         "references": [{
             "reference_doctype": "Purchase Invoice",
             "reference_name": invoice.name,
-            "allocated_amount": allocated,
+            "allocated_amount": as_float(allocated),
         }],
         "remarks": f"Airwallex bill payment for {bill_id}",
     }
