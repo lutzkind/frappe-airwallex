@@ -18,7 +18,7 @@ def import_bill(settings, client, bill: dict[str, Any], *, dry_run: bool = False
         return {"status": "held", "reason": "missing_id"}
     existing = frappe.db.get_value("Purchase Invoice", {"custom_airwallex_bill_id": bill_id}, "name")
     if existing:
-        return {"status": "exists", "name": existing, "id": bill_id}
+        return _reconcile_existing_bill(settings, existing, bill, dry_run=dry_run)
     if bill.get("status") not in BILL_APPROVED_STATES:
         return {"status": "held", "reason": f"bill_status:{bill.get('status')}", "id": bill_id}
     if not settings.enable_bills or not settings.create_accounting_documents:
@@ -83,6 +83,25 @@ def import_bill(settings, client, bill: dict[str, Any], *, dry_run: bool = False
     if settings.mark_bills_synced:
         client.request("POST", f"/api/v1/spend/bills/{bill_id}/sync", body={"sync_status": "SYNCED"})
     return {"status": "created", "name": doc.name, "id": bill_id, "payments": payments}
+
+
+def _reconcile_existing_bill(settings, invoice_name: str, bill: dict[str, Any], *, dry_run: bool = False):
+    """Re-sync an already imported bill, including its payment lifecycle."""
+    result = {"status": "exists", "name": invoice_name, "id": str(bill.get("id") or "")}
+    if bill.get("status") not in BILL_APPROVED_STATES:
+        return result
+    result["payments"] = import_bill_payments(settings, invoice_name, bill, dry_run=dry_run)
+    if not dry_run:
+        frappe.db.set_value(
+            "Purchase Invoice",
+            invoice_name,
+            {
+                "custom_airwallex_sync_status": bill.get("sync_status"),
+                "custom_airwallex_raw_hash": payload_hash(bill),
+            },
+            update_modified=False,
+        )
+    return result
 
 
 def sync_bills(settings, client, *, from_created_at: str, max_items: int, dry_run: bool = False):

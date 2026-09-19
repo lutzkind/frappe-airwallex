@@ -88,6 +88,11 @@ class FakeDocument:
         table = self._api.db.docs.setdefault(self.doctype, {})
         if self.name in table:
             raise DuplicateEntryError(f"{self.doctype} {self.name} already exists")
+        if self.doctype == "Purchase Invoice" and self._fields.get("outstanding_amount") is None:
+            total = Decimal(0)
+            for item in self._fields.get("items") or []:
+                total += Decimal(str(item.get("qty") or 0)) * Decimal(str(item.get("rate") or 0))
+            self._fields["outstanding_amount"] = total
         table[self.name] = self
         return self
 

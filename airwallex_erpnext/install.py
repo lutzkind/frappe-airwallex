@@ -43,7 +43,8 @@ CUSTOM_FIELDS: dict[str, list[dict[str, Any]]] = {
         {"fieldname": "custom_airwallex_section", "label": "Airwallex", "fieldtype": "Section Break", "insert_after": "remarks", "collapsible": 1},
         {"fieldname": "custom_airwallex_settings", "label": "Airwallex Settings", "fieldtype": "Link", "options": "Airwallex Settings", "insert_after": "custom_airwallex_section"},
         {"fieldname": "custom_airwallex_payment_id", "label": "Airwallex Payment ID", "fieldtype": "Data", "unique": 1, "insert_after": "custom_airwallex_settings"},
-        {"fieldname": "custom_airwallex_financial_transaction_id", "label": "Financial Transaction ID", "fieldtype": "Data", "insert_after": "custom_airwallex_payment_id"},
+        {"fieldname": "custom_airwallex_bill_id", "label": "Airwallex Bill ID", "fieldtype": "Data", "insert_after": "custom_airwallex_payment_id"},
+        {"fieldname": "custom_airwallex_financial_transaction_id", "label": "Financial Transaction ID", "fieldtype": "Data", "insert_after": "custom_airwallex_bill_id"},
     ],
     "Expense Claim": [
         {"fieldname": "custom_airwallex_section", "label": "Airwallex", "fieldtype": "Section Break", "insert_after": "remark", "collapsible": 1},

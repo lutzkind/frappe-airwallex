@@ -18,6 +18,8 @@ The app imports the full expense, creates or updates its Bank Transaction lineag
 
 Bills may map to Purchase Invoices when the module and posting controls permit it. Supplier resolution prefers explicit mappings and aliases. Supplier creation is off by default. Transfer-backed bill payments may map to Payment Entries; card-backed payments are held to avoid double booking, and external payments require an explicit bank-account path.
 
+Bill payment imports are reconciled on every sync, not only at Purchase Invoice creation. New payments are imported, draft entries are updated, submitted entries are amended when amounts or the mode of payment change, payments withdrawn from the bill (or reported as cancelled) cancel their entry, and allocations are capped by the invoice outstanding so partial payments and advances stay balanced.
+
 Cross-currency Payment Entries use the exchange rate from the Airwallex transfer payload when the payload states a matching currency pair, otherwise the ERPNext Currency Exchange records for the posting date. When a non-identity rate cannot be established the payment is held instead of posting at a fictitious 1:1 rate.
 
 ## Reimbursements

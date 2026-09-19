@@ -103,8 +103,133 @@ def test_bill_and_payment_reimport_is_idempotent(no_receipts):
     second = import_bill(settings, None, bill)
 
     assert second["status"] == "exists"
+    assert [item["status"] for item in second["payments"]["results"]] == ["exists"]
     assert len(frappe.get_all("Purchase Invoice", pluck="name")) == 1
     assert len(frappe.get_all("Payment Entry", pluck="name")) == 1
+
+
+def test_later_payment_on_updated_bill_is_imported(no_receipts):
+    settings = prepare_settings()
+    first_bill = bill_payload(payments=[transfer_payment("bpmt_001", amount="60.00")])
+    import_bill(settings, None, first_bill)
+
+    updated_bill = bill_payload(
+        payments=[
+            transfer_payment("bpmt_001", amount="60.00"),
+            transfer_payment("bpmt_002", amount="40.00"),
+        ]
+    )
+    result = import_bill(settings, None, updated_bill)
+
+    assert [item["status"] for item in result["payments"]["results"]] == ["exists", "created"]
+    entries = frappe.get_all("Payment Entry", fields=["name", "custom_airwallex_payment_id"])
+    assert sorted(entry.custom_airwallex_payment_id for entry in entries) == ["bpmt_001", "bpmt_002"]
+
+
+def test_repeated_resync_does_not_duplicate_payments(no_receipts):
+    settings = prepare_settings()
+    bill = bill_payload(payments=[transfer_payment()])
+    import_bill(settings, None, bill)
+
+    for _ in range(3):
+        result = import_bill(settings, None, bill)
+        assert [item["status"] for item in result["payments"]["results"]] == ["exists"]
+
+    assert len(frappe.get_all("Payment Entry", pluck="name")) == 1
+
+
+def test_submitted_payment_change_is_amended(no_receipts):
+    settings = prepare_settings()
+    import_bill(settings, None, bill_payload(payments=[transfer_payment(amount="100.00")]))
+    original = frappe.get_doc("Payment Entry", frappe.get_all("Payment Entry", pluck="name")[0])
+    assert original.docstatus == 1
+
+    result = import_bill(settings, None, bill_payload(payments=[transfer_payment(amount="120.00")]))
+
+    outcome = result["payments"]["results"][0]
+    assert outcome["status"] == "amended"
+    assert outcome["previous"] == original.name
+    cancelled = frappe.get_doc("Payment Entry", original.name)
+    assert cancelled.docstatus == 2
+    assert cancelled.custom_airwallex_payment_id is None
+    amendment = frappe.get_doc("Payment Entry", outcome["name"])
+    assert amendment.docstatus == 1
+    assert amendment.paid_amount == 120.0
+    assert amendment.amended_from == original.name
+    assert amendment.custom_airwallex_payment_id == "bpmt_001"
+    assert len(frappe.get_all("Payment Entry", pluck="name")) == 2
+
+
+def test_draft_payment_change_updates_in_place(no_receipts):
+    settings = prepare_settings()
+    import_bill(settings, None, bill_payload())
+    settings.submit_accounting_documents = 0
+    import_bill(settings, None, bill_payload(payments=[transfer_payment(amount="100.00")]))
+    draft = frappe.get_doc("Payment Entry", frappe.get_all("Payment Entry", pluck="name")[0])
+    assert draft.docstatus == 0
+
+    result = import_bill(settings, None, bill_payload(payments=[transfer_payment(amount="80.00")]))
+
+    outcome = result["payments"]["results"][0]
+    assert outcome["status"] == "updated"
+    assert outcome["name"] == draft.name
+    refreshed = frappe.get_doc("Payment Entry", draft.name)
+    assert refreshed.paid_amount == 80.0
+    assert refreshed.docstatus == 0
+
+
+def test_withdrawn_payment_is_cancelled(no_receipts):
+    settings = prepare_settings()
+    import_bill(settings, None, bill_payload(payments=[transfer_payment()]))
+    entry_name = frappe.get_all("Payment Entry", pluck="name")[0]
+
+    result = import_bill(settings, None, bill_payload(payments=[]))
+
+    outcome = result["payments"]["results"][0]
+    assert outcome["status"] == "cancelled"
+    assert outcome["reason"] == "payment_not_in_bill"
+    withdrawn = frappe.get_doc("Payment Entry", entry_name)
+    assert withdrawn.docstatus == 2
+    assert withdrawn.custom_airwallex_payment_id is None
+
+
+def test_terminal_payment_status_withdraws_entry(no_receipts):
+    settings = prepare_settings()
+    import_bill(settings, None, bill_payload(payments=[transfer_payment()]))
+
+    result = import_bill(
+        settings,
+        None,
+        bill_payload(payments=[transfer_payment(status="CANCELLED")]),
+    )
+
+    outcome = result["payments"]["results"][0]
+    assert outcome["status"] == "cancelled"
+    assert outcome["reason"] == "payment_trashed"
+
+
+def test_mode_of_payment_change_is_reconciled(no_receipts):
+    settings = prepare_settings()
+    for mode in ("Wire Transfer", "Bank Draft"):
+        frappe.get_doc({"doctype": "Mode of Payment", "name": mode}).insert()
+    import_bill(
+        settings,
+        None,
+        bill_payload(payments=[transfer_payment(payment_method="Wire Transfer")]),
+    )
+    original = frappe.get_doc("Payment Entry", frappe.get_all("Payment Entry", pluck="name")[0])
+    assert original.mode_of_payment == "Wire Transfer"
+
+    result = import_bill(
+        settings,
+        None,
+        bill_payload(payments=[transfer_payment(payment_method="Bank Draft")]),
+    )
+
+    outcome = result["payments"]["results"][0]
+    assert outcome["status"] == "amended"
+    amendment = frappe.get_doc("Payment Entry", outcome["name"])
+    assert amendment.mode_of_payment == "Bank Draft"
 
 
 def test_partial_payments_allocate_without_drift(no_receipts):
