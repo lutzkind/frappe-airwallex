@@ -18,6 +18,8 @@ The app imports the full expense, creates or updates its Bank Transaction lineag
 
 Bills may map to Purchase Invoices when the module and posting controls permit it. Supplier resolution prefers explicit mappings and aliases. Supplier creation is off by default. Transfer-backed bill payments may map to Payment Entries; card-backed payments are held to avoid double booking, and external payments require an explicit bank-account path.
 
+Cross-currency Payment Entries use the exchange rate from the Airwallex transfer payload when the payload states a matching currency pair, otherwise the ERPNext Currency Exchange records for the posting date. When a non-identity rate cannot be established the payment is held instead of posting at a fictitious 1:1 rate.
+
 ## Reimbursements
 
 Reimbursements can map to Expense Claims after an employee is resolved and an expense-claim type is configured. Missing employee or type mappings hold the item.

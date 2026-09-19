@@ -30,6 +30,69 @@ def test_bill_payment_created_with_bill(no_receipts):
     assert len(entries) == 1
     assert entries[0].custom_airwallex_payment_id == "bpmt_001"
     assert entries[0].paid_amount == 100.0
+    entry = frappe.get_doc("Payment Entry", entries[0].name)
+    assert entry.source_exchange_rate == 1
+    assert entry.target_exchange_rate == 1
+
+
+def test_cross_currency_payment_uses_currency_exchange_rate(no_receipts):
+    settings = prepare_settings()
+    fixtures.insert_currency_exchange("AUD", "USD", "0.66")
+    fixtures.insert_account_mapping("AUD")
+    bill = bill_payload(
+        currency="AUD",
+        amount="100.00",
+        payments=[transfer_payment(amount="100.00", currency="AUD")],
+    )
+
+    result = import_bill(settings, None, bill)
+
+    assert result["payments"]["results"][0]["status"] == "created"
+    entry = frappe.get_doc("Payment Entry", frappe.get_all("Payment Entry", pluck="name")[0])
+    assert entry.source_exchange_rate == 0.66
+    assert entry.target_exchange_rate == 0.66
+    assert entry.paid_amount == 100.0
+    assert entry.received_amount == 100.0
+
+
+def test_cross_currency_payment_uses_payload_fx_rate(no_receipts):
+    settings = prepare_settings()
+    fixtures.insert_account_mapping("AUD")
+    bill = bill_payload(
+        currency="AUD",
+        amount="100.00",
+        payments=[
+            transfer_payment(
+                amount="100.00",
+                currency="AUD",
+                target_currency="USD",
+                fx_rate="0.65",
+            )
+        ],
+    )
+
+    result = import_bill(settings, None, bill)
+
+    assert result["payments"]["results"][0]["status"] == "created"
+    entry = frappe.get_doc("Payment Entry", frappe.get_all("Payment Entry", pluck="name")[0])
+    assert entry.source_exchange_rate == 0.65
+
+
+def test_cross_currency_payment_fails_closed_without_rate(no_receipts):
+    settings = prepare_settings()
+    fixtures.insert_account_mapping("AUD")
+    bill = bill_payload(
+        currency="AUD",
+        amount="100.00",
+        payments=[transfer_payment(amount="100.00", currency="AUD")],
+    )
+
+    result = import_bill(settings, None, bill)
+
+    held = result["payments"]["results"][0]
+    assert held["status"] == "held"
+    assert held["reason"] == "missing_exchange_rate:AUD->USD"
+    assert frappe.get_all("Payment Entry", pluck="name") == []
 
 
 def test_bill_and_payment_reimport_is_idempotent(no_receipts):

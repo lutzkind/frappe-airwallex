@@ -4,6 +4,7 @@ from typing import Any
 
 import frappe
 
+from airwallex_erpnext.services.exchange_rates import get_company_currency, payload_rate, resolve_exchange_rate
 from airwallex_erpnext.services.mappings import account_mapping
 from airwallex_erpnext.utils import as_float, as_money, iso_to_date
 
@@ -44,17 +45,44 @@ def import_bill_payment(
     if invoice.docstatus != 1:
         return {"status": "held", "reason": "purchase_invoice_not_submitted", "id": payment_id}
 
-    currency = str(transfer.get("source_currency") or payment.get("currency") or invoice.currency or settings.default_currency)
-    mapping = account_mapping(settings.name, currency)
+    source_currency = str(transfer.get("source_currency") or payment.get("currency") or invoice.currency or settings.default_currency)
+    mapping = account_mapping(settings.name, source_currency)
     if not mapping:
-        return {"status": "held", "reason": f"missing_account_mapping:{currency}", "id": payment_id}
+        return {"status": "held", "reason": f"missing_account_mapping:{source_currency}", "id": payment_id}
 
     amount = as_money(payment.get("amount") or transfer.get("source_amount") or payment.get("source_amount"))
     if amount <= 0:
         return {"status": "held", "reason": "invalid_payment_amount", "id": payment_id}
-    outstanding = as_money(invoice.outstanding_amount or amount)
-    allocated = min(amount, outstanding)
     posting_date = iso_to_date(transfer.get("transfer_date") or payment.get("created_at") or payment.get("paid_at"))
+    company_currency = get_company_currency(invoice.company) or settings.default_currency
+    source_rate = resolve_exchange_rate(
+        source_currency,
+        company_currency,
+        posting_date=posting_date,
+        payload_rate=payload_rate(payment, transfer, source_currency, company_currency),
+    )
+    if source_rate is None:
+        return {"status": "held", "reason": f"missing_exchange_rate:{source_currency}->{company_currency}", "id": payment_id}
+    target_currency = _invoice_account_currency(invoice) or str(invoice.currency or company_currency)
+    if target_currency.upper() == source_currency.upper():
+        target_rate = source_rate
+    else:
+        target_rate = resolve_exchange_rate(target_currency, company_currency, posting_date=posting_date)
+    if target_rate is None:
+        return {"status": "held", "reason": f"missing_exchange_rate:{target_currency}->{company_currency}", "id": payment_id}
+    invoice_currency = str(invoice.currency or company_currency)
+    if invoice_currency.upper() == source_currency.upper():
+        invoice_rate = source_rate
+    else:
+        invoice_rate = resolve_exchange_rate(invoice_currency, company_currency, posting_date=posting_date)
+    if invoice_rate is None:
+        return {"status": "held", "reason": f"missing_exchange_rate:{invoice_currency}->{company_currency}", "id": payment_id}
+
+    base_amount = amount * source_rate
+    received_amount = as_money(base_amount / target_rate)
+    invoice_amount = as_money(base_amount / invoice_rate)
+    outstanding = as_money(invoice.outstanding_amount or invoice_amount)
+    allocated = min(invoice_amount, outstanding)
     values = {
         "doctype": "Payment Entry",
         "payment_type": "Pay",
@@ -64,9 +92,9 @@ def import_bill_payment(
         "party": invoice.supplier,
         "paid_from": mapping.ledger_account,
         "paid_amount": as_float(amount),
-        "received_amount": as_float(amount),
-        "source_exchange_rate": 1,
-        "target_exchange_rate": 1,
+        "received_amount": as_float(received_amount),
+        "source_exchange_rate": as_float(source_rate),
+        "target_exchange_rate": as_float(target_rate),
         "reference_no": payment_id,
         "reference_date": posting_date,
         "custom_airwallex_settings": settings.name,
@@ -102,3 +130,11 @@ def import_bill_payments(settings, invoice_name: str, bill: dict[str, Any], *, d
         if isinstance(payment, dict)
     ]
     return {"total": len(results), "results": results}
+
+
+def _invoice_account_currency(invoice) -> str | None:
+    account = invoice.get("credit_to")
+    if not account:
+        return None
+    currency = frappe.db.get_value("Account", account, "account_currency")
+    return str(currency) if currency else None
