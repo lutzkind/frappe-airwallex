@@ -20,6 +20,8 @@ Webhook delivery is acknowledged into an **Airwallex Webhook Event** record with
 
 Duplicate event IDs are recognized. Duplicate delivery may update duplicate-delivery metadata, but it does not create a second integration record. Failed events can retry up to the configured attempt limit and then move to a dead-letter state.
 
+A worker that stops hard mid-run leaves its event in `Processing`. The five-minute scheduler reclaims events that exceed the configured **Processing Timeout Minutes**, returning them to the retry queue while attempts remain and moving them to the terminal `Dead Letter` state once the attempt budget is exhausted. Re-processing is idempotent because every import is keyed on its Airwallex external ID.
+
 ## API version and events
 
 Spend webhooks require an Airwallex API version of `2025-11-11` or newer. The managed subscription follows the enabled modules:

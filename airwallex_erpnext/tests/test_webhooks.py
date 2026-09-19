@@ -6,7 +6,7 @@ import frappe
 import pytest
 
 from airwallex_erpnext.services.webhooks import process_event, store_event
-from airwallex_erpnext.tests import fixtures
+from airwallex_erpnext.tests import fixtures, frappe_stub
 from airwallex_erpnext.tests.fixtures import webhook_payload
 
 
@@ -95,3 +95,83 @@ def test_process_event_dead_letters_when_attempts_exhausted(monkeypatch):
     failed = frappe.get_doc("Airwallex Webhook Event", event.name)
     assert failed.status == "Dead Letter"
     assert failed.attempts == 2
+
+
+def test_stale_processing_event_is_requeued_and_processed():
+    from airwallex_erpnext.services.webhooks import recover_stale_events
+    from airwallex_erpnext.tasks import process_webhook_queue
+
+    settings = fixtures.insert_settings()
+    fixtures.insert_company()
+    fixtures.insert_account_mapping("USD")
+    event = store(settings, webhook_payload())
+    frappe.db.set_value("Airwallex Webhook Event", event.name, {"status": "Processing", "attempts": 1})
+    frappe_stub.age_document("Airwallex Webhook Event", event.name, minutes=30)
+
+    recovery = recover_stale_events()
+
+    assert recovery == {"requeued": [event.name], "dead_lettered": []}
+    recovered = frappe.get_doc("Airwallex Webhook Event", event.name)
+    assert recovered.status == "Retrying"
+    assert recovered.last_error.startswith("stale_processing_timeout")
+
+    queued = process_webhook_queue()
+
+    assert queued["queued"] == [event.name]
+    assert any(job["kwargs"].get("event_name") == event.name for job in frappe_stub.get_api().jobs)
+
+    result = process_event(event.name)
+
+    assert result["status"] == "processed"
+    assert frappe.get_doc("Airwallex Webhook Event", event.name).status == "Processed"
+    assert len(frappe.get_all("Bank Transaction", pluck="name")) == 1
+
+    # Retrying again after success is a no-op, not a duplicate booking.
+    assert process_event(event.name) == {"status": "Processed"}
+    assert len(frappe.get_all("Bank Transaction", pluck="name")) == 1
+
+
+def test_fresh_processing_event_is_not_recovered():
+    from airwallex_erpnext.services.webhooks import recover_stale_events
+    from airwallex_erpnext.tasks import process_webhook_queue
+
+    settings = fixtures.insert_settings()
+    event = store(settings, webhook_payload())
+    frappe.db.set_value("Airwallex Webhook Event", event.name, {"status": "Processing", "attempts": 1})
+
+    assert recover_stale_events() == {"requeued": [], "dead_lettered": []}
+    assert frappe.get_doc("Airwallex Webhook Event", event.name).status == "Processing"
+    assert process_webhook_queue()["queued"] == []
+
+
+def test_stale_processing_dead_letters_when_attempts_exhausted():
+    from airwallex_erpnext.services.webhooks import recover_stale_events
+    from airwallex_erpnext.tasks import process_webhook_queue
+
+    settings = fixtures.insert_settings(webhook_max_attempts=2)
+    event = store(settings, webhook_payload())
+    frappe.db.set_value("Airwallex Webhook Event", event.name, {"status": "Processing", "attempts": 2})
+    frappe_stub.age_document("Airwallex Webhook Event", event.name, minutes=30)
+
+    recovery = recover_stale_events()
+
+    assert recovery == {"requeued": [], "dead_lettered": [event.name]}
+    dead = frappe.get_doc("Airwallex Webhook Event", event.name)
+    assert dead.status == "Dead Letter"
+    assert dead.last_error.startswith("stale_processing_timeout")
+    assert process_webhook_queue()["queued"] == []
+
+
+def test_stale_recovery_respects_configured_timeout():
+    from airwallex_erpnext.services.webhooks import recover_stale_events
+
+    settings = fixtures.insert_settings(webhook_processing_timeout_minutes=60)
+    event = store(settings, webhook_payload())
+    frappe.db.set_value("Airwallex Webhook Event", event.name, "status", "Processing")
+    frappe_stub.age_document("Airwallex Webhook Event", event.name, minutes=30)
+
+    assert recover_stale_events() == {"requeued": [], "dead_lettered": []}
+
+    frappe.db.set_value("Airwallex Settings", settings.name, "webhook_processing_timeout_minutes", 10)
+
+    assert recover_stale_events() == {"requeued": [event.name], "dead_lettered": []}

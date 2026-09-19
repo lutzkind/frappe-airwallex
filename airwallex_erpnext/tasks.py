@@ -8,8 +8,9 @@ def enabled_settings():
 
 
 def process_webhook_queue():
-    from airwallex_erpnext.services.webhooks import process_event
+    from airwallex_erpnext.services.webhooks import process_event, recover_stale_events
 
+    recovery = recover_stale_events()
     names = frappe.get_all(
         "Airwallex Webhook Event",
         filters={"status": ["in", ["Received", "Retrying"]]},
@@ -19,6 +20,11 @@ def process_webhook_queue():
     )
     for name in names:
         frappe.enqueue(process_event, queue="short", event_name=name, job_name=f"airwallex-event-{name}")
+    return {
+        "requeued": recovery["requeued"],
+        "dead_lettered": recovery["dead_lettered"],
+        "queued": names,
+    }
 
 
 def hourly_recovery():
