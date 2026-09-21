@@ -1,4 +1,4 @@
-standard_version: 1.0.0
+standard_version: 2.4.0
 profile: frappe
 default_branch: main
 self_hosted_labels:
@@ -9,6 +9,9 @@ self_hosted_labels:
   - isolated
 heavy_checks:
   enabled: false
-custom_commands: {}
+custom_commands:
+  setup: 'python -m pip install -e . && python -m pip install --upgrade pip'
+  checks: 'python -m compileall -q airwallex_erpnext && ruff check . && python -m build && python -m compileall -q .'
 exceptions:
-  - Token-backed Gitleaks reporting remains GitHub-hosted with same-repository protection.
+  - 'needs-test-definition: no declared test command'
+  - 'application checks delegated to existing PR CI: .github/workflows/ci.yml'
