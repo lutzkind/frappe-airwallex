@@ -8,7 +8,7 @@ from airwallex_erpnext.constants import EXPENSE_APPROVED_STATES
 from airwallex_erpnext.services.mappings import account_mapping, resolve
 from airwallex_erpnext.services.receipts import attach_provider_receipts
 from airwallex_erpnext.services.suppliers import resolve_supplier
-from airwallex_erpnext.utils import as_float, iso_to_date, payload_hash
+from airwallex_erpnext.utils import as_float, as_money, iso_to_date, payload_hash
 
 
 def import_expense(settings, client, expense: dict[str, Any], *, dry_run: bool = False) -> dict[str, Any]:
@@ -23,7 +23,7 @@ def import_expense(settings, client, expense: dict[str, Any], *, dry_run: bool =
     if not mapping:
         return {"status": "held", "reason": f"missing_account_mapping:{currency}", "id": expense_id}
 
-    amount = as_float(expense.get("billing_amount"))
+    amount = as_money(expense.get("billing_amount"))
     if not bank_transaction:
         values = {
             "doctype": "Bank Transaction",
@@ -31,7 +31,7 @@ def import_expense(settings, client, expense: dict[str, Any], *, dry_run: bool =
             "bank_account": mapping.bank_account,
             "currency": currency,
             "deposit": 0,
-            "withdrawal": abs(amount),
+            "withdrawal": as_float(abs(amount)),
             "description": expense.get("merchant") or expense.get("description") or "Airwallex card expense",
             "reference_number": expense_id,
             "custom_airwallex_settings": settings.name,
@@ -114,7 +114,7 @@ def _create_accounting_document(settings, expense, mapped, bank_transaction, str
     if not mapped.expense_account:
         return {"status": "held", "reason": "expense_account_required"}
 
-    amount = as_float(expense.get("billing_amount"))
+    amount = as_money(expense.get("billing_amount"))
     values = {
         "doctype": "Purchase Invoice",
         "company": mapped.company or settings.company,
@@ -134,7 +134,7 @@ def _create_accounting_document(settings, expense, mapped, bank_transaction, str
                 "item_name": expense.get("merchant") or "Airwallex expense",
                 "description": expense.get("description") or expense.get("merchant") or "Airwallex expense",
                 "qty": 1,
-                "rate": amount,
+                "rate": as_float(amount),
                 "expense_account": mapped.expense_account,
                 "cost_center": mapped.cost_center,
                 "project": mapped.project,
@@ -169,7 +169,7 @@ def _create_expense_claim(settings, expense, mapped, bank_transaction, *, dry_ru
         return {"status": "held", "reason": f"employee_mapping_required:{email or 'unknown'}"}
     if not settings.default_expense_claim_type:
         return {"status": "held", "reason": "default_expense_claim_type_required"}
-    amount = as_float(expense.get("billing_amount"))
+    amount = as_money(expense.get("billing_amount"))
     values = {
         "doctype": "Expense Claim",
         "employee": employee,
@@ -184,8 +184,8 @@ def _create_expense_claim(settings, expense, mapped, bank_transaction, *, dry_ru
             "expense_date": iso_to_date(expense.get("settled_at") or expense.get("created_at")),
             "expense_type": settings.default_expense_claim_type,
             "description": expense.get("description") or expense.get("merchant") or "Airwallex card expense",
-            "amount": amount,
-            "sanctioned_amount": amount,
+            "amount": as_float(amount),
+            "sanctioned_amount": as_float(amount),
             "cost_center": mapped.cost_center,
             "project": mapped.project,
         }],
