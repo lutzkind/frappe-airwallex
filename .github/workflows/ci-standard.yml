@@ -5,6 +5,7 @@ on:
     branches: [main]
     paths:
       - '.github/ci-standard.yml'
+      - '.github/ci-standard/agent_friendliness.py'
       - '.github/workflows/ci-standard-heavy.yml'
       - '.github/workflows/ci-standard.yml'
   workflow_dispatch:
@@ -46,6 +47,11 @@ jobs:
           python -m build
           python -m compileall -q .
           echo 'No declared test command; onboarding remains needs-test-definition.'
+      - name: Check agent-friendliness contract
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 .github/ci-standard/agent_friendliness.py --root .
       - name: Clean generated workspace data
         if: always()
         shell: bash
